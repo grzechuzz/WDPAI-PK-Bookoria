@@ -8,8 +8,15 @@
     <link rel="stylesheet" href="/public/styles/login.css">
 </head>
 <body>
-    <form>
+    <form action="POST" action="/login">
         <h1 id="title">LOGIN</h1>
+
+        <?php if(isset($messages)): ?>
+            <p class="messages">
+            <?= $messages; ?>
+            </p>
+        <?php endif; ?>
+
         <label for="email">e-mail</label>
         <input id="email" 
                name="email" 
