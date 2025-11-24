@@ -1,9 +1,18 @@
-h1 { color: blue; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-    margin: 0;
-    padding: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: rgb(246, 247, 248); 
+  color: #111827;
 }
+
 
 messages {
     color: red;
