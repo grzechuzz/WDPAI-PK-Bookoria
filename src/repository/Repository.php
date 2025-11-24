@@ -6,7 +6,7 @@ class Repository {
     
     protected $database;
 
-    public function __constructor() {
+    public function __construct() {
         $this->database = new Database();
     }
 }
