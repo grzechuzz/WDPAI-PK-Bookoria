@@ -12,7 +12,7 @@ class Database {
 
         $host = $_ENV['DB_HOST'] ?? 'db';
         $port = $_ENV['DB_PORT'] ?? '5432';
-        $db   = $_ENV['DB_NAME'] ?? 'db';
+        $db = $_ENV['DB_NAME'] ?? 'db';
         $user = $_ENV['DB_USER'] ?? 'docker';
         $pass = $_ENV['DB_PASSWORD'] ?? 'docker';
 
