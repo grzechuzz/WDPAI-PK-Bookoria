@@ -1,3 +1,4 @@
 .vscode
 .vs
 config.php
+.env
