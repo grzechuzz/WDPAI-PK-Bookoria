@@ -1,39 +1,25 @@
 <?php
 
-// TODO .env + dopisac disconnect
-require_once "config.php";
 
 class Database {
-    private $username;
-    private $password;
-    private $host;
-    private $database;
+    private static ?PDO $conn = null;
 
-    public function __construct()
+    public static function connect(): PDO 
     {
-        $this->username = USERNAME;
-        $this->password = PASSWORD;
-        $this->host = HOST;
-        $this->database = DATABASE;
-    }
-
-    public function connect()
-    {
-        try {
-            $conn = new PDO(
-                "pgsql:host=$this->host;port=5432;dbname=$this->database",
-                $this->username,
-                $this->password,
-                ["sslmode"  => "prefer"]
-            );
-
-            // set the PDO error mode to exception
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $conn;
+        if (self::$conn !== null) {
+            return self::$conn;
         }
-        catch(PDOException $e) {
-            // przekierowanie na strone z bledem 
-            die("Connection failed: " . $e->getMessage());
-        }
+
+        $host = $_ENV['DB_HOST'] ?? 'db';
+        $port = $_ENV['DB_PORT'] ?? '5432';
+        $db   = $_ENV['DB_NAME'] ?? 'db';
+        $user = $_ENV['DB_USER'] ?? 'docker';
+        $pass = $_ENV['DB_PASSWORD'] ?? 'docker';
+
+        $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$db", $user, $pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        self::$conn = $pdo;
+        return $pdo;
     }
 }
