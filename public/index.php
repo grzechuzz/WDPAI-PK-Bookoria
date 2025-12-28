@@ -1,8 +1,13 @@
 <?php
 
-require_once 'Routing.php';
+require_once __DIR__ . '/../src/core/Env.php';
+require_once __DIR__ . '/../src/core/Routing.php';
+require_once __DIR__ . '/../src/core/Database.php';
 
-$path = trim($_SERVER['REQUEST_URI'], '/');
-$path = parse_url($path, PHP_URL_PATH);
 
-Routing::run($path);
+Env::load(__DIR__ . '/../.env');
+
+$router = Routing::getInstance();
+
+$path = $_SERVER['REQUEST_URI']; 
+$router->run($_SERVER['REQUEST_METHOD'], $path);
