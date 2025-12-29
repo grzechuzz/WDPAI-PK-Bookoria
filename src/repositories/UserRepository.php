@@ -1,20 +1,54 @@
 <?php
 
-require_once __DIR__."/../../Database.php";
-require_once 'Repository.php';
+require_once  __DIR__ . '/Repository.php';
 
-class UserRepository extends Repository {
-    
-    public function getUsers(): ?array {
-        $query = $this->database->connect()->prepare(
-            "
-            SELECT * FROM public.users;
-            "
-        );
 
-        $query->execute();
+final class UserRepository extends Repository {
+    public function findByEmail(string $email) 
+    {
+        $sql = "SELECT id, email, password_hash, role_id, created_at FROM users 
+                WHERE email = :email LIMIT 1";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['email' => $email]);
 
-        $users = $query->fetchall(PDO::FETCH_ASSOC);
-        return $users;
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public function findById(int $id) 
+    {
+        $sql = "SELECT id, email, password_hash, role_id, created_at FROM users
+                WHERE id = :id LIMIT 1";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['id' => $id]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public function create(string $email, string $passwordHash, int $roleId) 
+    {
+        $sql = "INSERT INTO users (email, password_hash, role_id)
+                VALUES (:email, :password_hash, :role_id) RETURNING id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'email' => $email,
+            'password_hash' => $passwordHash,
+            'role_id' => $roleId  
+        ]);
+
+        return (int)$stmt->fetchColumn();
+    }
+
+     public function existsByEmail(string $email)
+    {
+        $sql = "SELECT 1 FROM users WHERE email = :email LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['email' => $email]);
+
+        return $stmt->fetchColumn() !== false;
     }
 }
