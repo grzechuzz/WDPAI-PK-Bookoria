@@ -7,6 +7,7 @@ final class DomainError {
     public const EMAIL_TAKEN = 1003;
     public const INVALID_LOGIN = 1004;
     public const ROLE_NOT_FOUND = 1005;
+    public const PASSWORD_MISMATCH = 1006;
 
     private function __construct() {}
 }
