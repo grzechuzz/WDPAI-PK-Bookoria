@@ -3,11 +3,15 @@
 require_once __DIR__ . '/../src/core/Env.php';
 require_once __DIR__ . '/../src/core/Routing.php';
 require_once __DIR__ . '/../src/core/Database.php';
+require_once __DIR__ . '/../src/controllers/AuthController.php';
 
 
 Env::load(__DIR__ . '/../.env');
 
 $router = Routing::getInstance();
+
+$router->get('/register', [new AuthController(), 'register']);
+$router->post('/register', [new AuthController(), 'register']);
 
 $path = $_SERVER['REQUEST_URI']; 
 $router->run($_SERVER['REQUEST_METHOD'], $path);
