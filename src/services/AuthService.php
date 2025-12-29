@@ -32,7 +32,7 @@ final class AuthService {
             throw new RuntimeException('Email already taken.', DomainError::EMAIL_TAKEN);
         }
 
-        $readerRoleId = $this->roleRepository->findIdByName('READER');
+        $readerRoleId = $this->roleRepository->findIdByCode('READER');
         if ($readerRoleId === null) {
             throw new RuntimeException('Reader role not found.', DomainError::ROLE_NOT_FOUND);
         }
