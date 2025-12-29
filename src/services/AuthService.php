@@ -16,12 +16,16 @@ final class AuthService {
         $this->roleRepository = $roleRepository;
     }
 
-    public function register(string $email, string $password)
+    public function register(string $email, string $password, string $confirmedPassword)
     {
         $email = trim(mb_strtolower($email));
 
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new RuntimeException('Invalid email.', DomainError::BAD_EMAIL);
+        }
+
+        if ($password !== $confirmedPassword) {
+            throw new RuntimeException('Passwords do not match.', DomainError::PASSWORD_MISMATCH); 
         }
 
         if (trim($password) === '' || mb_strlen($password) < 8) {
