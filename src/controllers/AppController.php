@@ -1,40 +1,37 @@
 <?php
 
+abstract class AppController {
 
-class AppController {
-
-    protected function isGet(): bool
-    {
-        return $_SERVER["REQUEST_METHOD"] === 'GET';
+    protected function isGet() {
+        return $_SERVER['REQUEST_METHOD'] === 'GET';
     }
 
-    protected function isPost(): bool
-    {
-        return $_SERVER["REQUEST_METHOD"] === 'POST';
+    protected function isPost() {
+        return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
- 
 
-    protected function render(string $template = null, array $variables = [])
-    {
-        $templatePath = 'public/views/'. $template.'.html';
-        $templatePath404 = 'public/views/404.html';
-        $output = "";
-                 
-        if(file_exists($templatePath)){
-            // ["message" => "Błędne hasło!"]
+    protected function render(string $template = null, array $variables = []) {
+        $templatePath = __DIR__ . '/../views/' . $template . '.php';
+        $output = 'File not found: ' . $templatePath;
+                
+        if (file_exists($templatePath)) {
             extract($variables);
-            // $message = "Błędne hasło!"
-            //echo $message
-            
+
             ob_start();
             include $templatePath;
-            $output = ob_get_clean();
-        } else {
+            $content = ob_get_clean(); 
+
+  
             ob_start();
-            include $templatePath404;
+            include __DIR__ . '/../views/layout.php';
             $output = ob_get_clean();
-        }
+        } 
+        
         echo $output;
     }
 
+    protected function redirect(string $url) {
+        header("Location: {$url}");
+        exit;
+    }
 }
