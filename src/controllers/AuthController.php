@@ -43,9 +43,10 @@ class AuthController extends AppController {
         if ($this->isPost()) {
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
+            $confirmedPassword = $_POST['confirmedPassword'] ?? '';
 
             try {
-                $this->authService->register($email, $password);
+                $this->authService->register($email, $password, $confirmedPassword);
                 $this->redirect('/login');
                 return;
 
