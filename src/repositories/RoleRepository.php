@@ -5,11 +5,11 @@ require_once  __DIR__ . '/Repository.php';
 
 final class RoleRepository extends Repository
 {
-    public function findIdByName(string $name) 
+    public function findIdByCode(string $code) 
     {
-        $sql = "SELECT id FROM roles WHERE name = :name LIMIT 1";
+        $sql = "SELECT id FROM roles WHERE code = :code LIMIT 1";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['name' => $name]);
+        $stmt->execute(['code' => $code]);
 
         $id = $stmt->fetchColumn();
         return ($id === false) ? null : (int)$id;
