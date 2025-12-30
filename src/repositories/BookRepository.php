@@ -67,4 +67,22 @@ class BookRepository extends Repository {
 
         return (int)$stmt->fetchColumn();
     }
+
+    public function findById(int $id) {
+        $sql = "
+            SELECT b.*, STRING_AGG(DISTINCT a.name, ', ') as author, COALESCE(SUM(v.available_count), 0) as total_available
+            FROM books b
+            LEFT JOIN book_authors ba ON b.id = ba.book_id
+            LEFT JOIN authors a ON ba.author_id = a.id
+            LEFT JOIN v_book_availability_by_branch v ON b.id = v.book_id
+            WHERE b.id = :id
+            GROUP BY b.id
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $book = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $book ?: null;
+    }
 }
