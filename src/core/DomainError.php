@@ -8,6 +8,7 @@ final class DomainError {
     public const INVALID_LOGIN = 1004;
     public const ROLE_NOT_FOUND = 1005;
     public const PASSWORD_MISMATCH = 1006;
+    public const BOOK_NOT_FOUND = 1007;
 
     private function __construct() {}
 }
