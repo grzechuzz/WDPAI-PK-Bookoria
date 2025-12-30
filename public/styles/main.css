@@ -715,3 +715,233 @@ a.dashboard-card:hover .card {
         padding-left: 3rem !important; 
     }
 }
+
+.book-details-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.details-top-bar {
+    margin-bottom: 2rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+
+
+.book-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr; 
+    gap: 4rem;
+    align-items: start; 
+}
+
+
+.book-cover-column {
+    position: sticky;
+    top: 100px; 
+}
+
+.cover-container {
+    background: #f0f2f5; 
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    justify_content: center;
+    align-items: center;
+}
+
+.book-cover-img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.1); 
+    max-height: 500px;
+    object-fit: contain;
+}
+
+.placeholder-cover {
+    width: 100%;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd3da;
+    font-size: 5rem;
+}
+
+
+.book-info-column {
+    padding-top: 1rem;
+}
+
+.book-title {
+    font-size: 2.5rem; 
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+}
+
+.book-author {
+    font-size: 1.25rem;
+    color: var(--primary); 
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.book-description {
+    font-size: 1.05rem;
+    line-height: 1.7; 
+    color: #444;
+    margin-bottom: 2.5rem;
+    max-width: 90%; 
+}
+
+.book-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 2rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.meta-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.meta-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.meta-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.availability-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-line {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.btn-primary-lg {
+    background-color: var(--primary);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+}
+
+.btn-primary-lg:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-disabled-lg {
+    background-color: #e2e8f0;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+    .book-grid {
+        grid-template-columns: 1fr; 
+        gap: 2rem;
+    }
+    
+    .book-cover-column {
+        position: static; 
+        max-width: 400px;
+        margin: 0 auto; 
+    }
+
+    .book-title {
+        font-size: 1.8rem;
+    }
+    
+    .book-meta-grid {
+        grid-template-columns: 1fr 1fr; 
+        gap: 1rem;
+    }
+}
+
+.branches-list{
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  max-height: 180px;     
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.branch-row{
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.branch-name{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.branch-right{
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.branch-available{ color: #16a34a; }   
+.branch-unavailable{ color: #dc2626; } 
