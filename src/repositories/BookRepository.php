@@ -21,7 +21,7 @@ class BookRepository extends Repository {
         }
 
         $sql = "
-            SELECT b.id, b.title, b.isbn13, b.cover_url, STRING_AGG(a.name, ', ') as author, COALESCE(SUM(v.available_count), 0) as total_available FROM books b
+            SELECT b.id, b.title, b.isbn13, b.cover_url, STRING_AGG(DISTINCT a.name, ', ') as author, COALESCE(SUM(v.available_count), 0) as total_available FROM books b
             LEFT JOIN book_authors ba ON b.id = ba.book_id
             LEFT JOIN authors a ON ba.author_id = a.id
             LEFT JOIN v_book_availability_by_branch v ON b.id = v.book_id
