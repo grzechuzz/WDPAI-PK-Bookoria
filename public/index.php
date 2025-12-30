@@ -19,6 +19,7 @@ $router->post('/login', [new AuthController(), 'login']);
 $router->get('/logout', [new AuthController(), 'logout']);
 $router->get('/dashboard', [new DashboardController(), 'index']);
 $router->get('/repository', [new BookController(), 'index']);
+$router->get('/book', [new BookController(), 'show']);
 
 $path = $_SERVER['REQUEST_URI']; 
 $router->run($_SERVER['REQUEST_METHOD'], $path);
