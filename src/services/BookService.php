@@ -1,6 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../repositories/BookRepository.php';
+require_once __DIR__ . '/../core/DomainError.php';
 
 
 class BookService {
@@ -29,6 +30,30 @@ class BookService {
             'currentPage' => $pageNumber,
             'totalPages' => $totalPages,
             'search' => $search 
+        ];
+    }
+
+    public function getDetails(int $id) {
+        $rows = $this->bookRepository->findById($id);
+
+        if (!$rows) {
+            throw new RuntimeException('Book not found', DomainError::BOOK_NOT_FOUND);
+        }
+
+        $book = $rows[0];
+        $branches = [];
+        foreach ($rows as $row) {
+            if ($row['branch_label']) { 
+                $branches[] = [
+                    'label' => $row['branch_label'],
+                    'count' => (int)$row['available_count']
+                ];
+            }
+        }
+
+        return [
+            'details' => $book,
+            'branches' => $branches
         ];
     }
 }
