@@ -10,6 +10,8 @@ require_once __DIR__ . '/../src/controllers/BookController.php';
 
 Env::load(__DIR__ . '/../.env');
 
+session_start();
+
 $router = Routing::getInstance();
 
 $router->get('/register', [new AuthController(), 'register']);
