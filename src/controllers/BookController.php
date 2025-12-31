@@ -17,39 +17,23 @@ class BookController extends AppController {
     }
 
     public function index() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        if (!isset($_SESSION['user_id'])) {
-            $this->redirect('/login');
-            return;
-        }
+        Auth::requireLogin();
 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $search = isset($_GET['search']) ? trim($_GET['search']) : null;
 
-
         $data = $this->bookService->getBooksForPage($page, $search);
-
-
         $this->render('books/repository', $data);
     }
 
-    public function show() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
 
-        if (!isset($_SESSION['user_id'])) {
-            $this->redirect('/login');
-            return;
-        }
+    public function show() {
+        Auth::requireLogin();
 
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
         if (!$id || $id < 1) {
             http_response_code(400);
-            $this->redirect('/books/repository');
+            $this->redirect('/repository');
             return;
         }
 
@@ -64,7 +48,7 @@ class BookController extends AppController {
         } catch (Exception $e) {
             if ($e->getCode() === DomainError::BOOK_NOT_FOUND) {
                 http_response_code(404);
-                $this->redirect('/books/repository');
+                $this->redirect('/repository');
                 return;
             }
 

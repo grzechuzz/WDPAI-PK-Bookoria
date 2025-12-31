@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../src/core/Env.php';
 require_once __DIR__ . '/../src/core/Routing.php';
 require_once __DIR__ . '/../src/core/Database.php';
+require_once __DIR__ . '/../src/core/Auth.php';
 require_once __DIR__ . '/../src/controllers/AuthController.php';
 require_once __DIR__ . '/../src/controllers/DashboardController.php';
 require_once __DIR__ . '/../src/controllers/BookController.php';

@@ -22,9 +22,6 @@ class AuthController extends AppController {
             try {
                 $user = $this->authService->login($email, $password);
                 
-                if (session_status() === PHP_SESSION_NONE) {
-                    session_start();
-                }
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['role_id'] = $user['role_id'];
 
@@ -59,7 +56,7 @@ class AuthController extends AppController {
     }
 
     public function logout() {
-        session_start();
+        $_SESSION = [];
         session_destroy();
         $this->redirect('/login');
     }
