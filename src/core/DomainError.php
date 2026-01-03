@@ -13,6 +13,7 @@ final class DomainError {
     public const LOAN_RENEW_NOT_ALLOWED = 1009;
     public const RESERVATION_NOT_FOUND = 1010;
     public const RESERVATION_CANCEL_NOT_ALLOWED = 1011;
+    public const RESERVATION_CREATE_NOT_ALLOWED = 1012;
 
     private function __construct() {}
 }
