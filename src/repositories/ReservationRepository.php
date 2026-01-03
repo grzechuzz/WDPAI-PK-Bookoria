@@ -49,4 +49,21 @@ final class ReservationRepository extends Repository
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
+
+    public function cancelActive(int $reservationId, int $userId): bool
+    {
+        $sql = "
+            UPDATE reservations
+            SET status = 'CANCELLED', ready_until = NULL, assigned_copy_id = NULL
+            WHERE id = :res_id AND user_id = :user_id AND status IN ('QUEUED', 'READY_FOR_PICKUP')
+            RETURNING id
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue('res_id', $reservationId, PDO::PARAM_INT);
+        $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
 }

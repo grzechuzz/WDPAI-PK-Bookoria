@@ -57,4 +57,22 @@ final class LoanRepository extends Repository
 
         return (int)$stmt->fetchColumn();
     }
+
+    public function renewIfAllowed(int $loanId, int $userId, int $days = 14)
+    {
+        $sql = "
+            UPDATE loans
+            SET due_at = due_at + make_interval(days => :days), renewals_count = renewals_count + 1
+            WHERE id = :loan_id AND user_id = :user_id AND returned_at IS NULL AND renewals_count = 0 AND now() <= due_at
+            RETURNING id
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue('days', $days, PDO::PARAM_INT);
+        $stmt->bindValue('loan_id', $loanId, PDO::PARAM_INT);
+        $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
 }
