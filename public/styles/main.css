@@ -945,3 +945,77 @@ a.dashboard-card:hover .card {
 
 .branch-available{ color: #16a34a; }   
 .branch-unavailable{ color: #dc2626; } 
+
+.profile-page .profile-title {
+  margin-bottom: 1rem;
+}
+
+.profile-page .profile-tabs {
+  display: inline-flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-page .profile-tab {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
+  color: var(--text-main);
+  border-radius: 10px;
+  padding: 0.6rem 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.profile-page .profile-tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: rgba(17, 115, 212, 0.04);
+}
+
+.profile-page .profile-tab.is-active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.profile-page .profile-tab.is-active:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: #fff;
+}
+
+.profile-page .profile-panel {
+  margin-bottom: 2.5rem;
+}
+
+.profile-page .profile-section-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0; 
+}
+
+.profile-page .profile-subtitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 1.25rem 0 0.75rem 0;
+}
+
+.profile-page .profile-muted {
+  color: var(--text-muted);
+  margin: 0 0 1rem 0;
+}
+
+.profile-page .profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .profile-page .profile-section-title {
+    font-size: 1.5rem;
+  }
+}
