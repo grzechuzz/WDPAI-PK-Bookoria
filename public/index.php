@@ -7,6 +7,7 @@ require_once __DIR__ . '/../src/core/Auth.php';
 require_once __DIR__ . '/../src/controllers/AuthController.php';
 require_once __DIR__ . '/../src/controllers/DashboardController.php';
 require_once __DIR__ . '/../src/controllers/BookController.php';
+require_once __DIR__ . '/../src/controllers/ProfileController.php';
 
 
 Env::load(__DIR__ . '/../.env');
@@ -23,6 +24,8 @@ $router->get('/logout', [new AuthController(), 'logout']);
 $router->get('/dashboard', [new DashboardController(), 'index']);
 $router->get('/repository', [new BookController(), 'index']);
 $router->get('/book', [new BookController(), 'show']);
+$router->get('/profile', [new ProfileController(), 'index']);
+
 
 $path = $_SERVER['REQUEST_URI']; 
 $router->run($_SERVER['REQUEST_METHOD'], $path);
