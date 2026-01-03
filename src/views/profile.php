@@ -28,6 +28,7 @@ function formatDateTime(?string $ts, string $tz = 'Europe/Warsaw'): string {
 function loanStatusLabel(array $l): string {
     $returnedAt = $l['returned_at'] ?? null;
     if ($returnedAt) return 'Zwrócone';
+
     $isOverdue = (bool)($l['is_overdue'] ?? false);
     return $isOverdue ? 'Po terminie' : 'Aktywne';
 }
@@ -48,12 +49,24 @@ function reservationStatusLabel(string $status): string {
 
     <h1 class="repo-header profile-title">Twój profil</h1>
 
+    <?php if (!empty($_SESSION['flash_success'])): ?>
+        <div class="error-msg" style="color:#155724;background:rgba(40,167,69,0.12);">
+            <?= h($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($_SESSION['flash_error'])): ?>
+        <div class="error-msg">
+            <?= h($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?>
+        </div>
+    <?php endif; ?>
+
     <?php if ($limitReached): ?>
         <div class="error-msg" role="alert">
             Osiągnięto limit wypożyczeń (<?= $activeLoansCount ?> / <?= $maxLoans ?>).
         </div>
     <?php endif; ?>
-    
+
     <div class="profile-tabs" role="tablist" aria-label="Sekcje profilu">
         <button class="profile-tab tab-btn is-active"
                 type="button"
@@ -80,6 +93,7 @@ function reservationStatusLabel(string $status): string {
         </button>
     </div>
 
+    <!-- WYPOŻYCZENIA -->
     <section class="profile-panel" data-tab-panel="loans">
         <h2 class="profile-section-title">Wypożyczenia</h2>
 
@@ -96,6 +110,7 @@ function reservationStatusLabel(string $status): string {
                         $isOverdue = (bool)($loan['is_overdue'] ?? false);
                         $renewals = (int)($loan['renewals_count'] ?? 0);
                         $canRenew = !$isOverdue && $renewals === 0;
+                        $loanId = (int)($loan['loan_id'] ?? $loan['id'] ?? 0);
                     ?>
 
                     <article class="repo-card">
@@ -120,10 +135,13 @@ function reservationStatusLabel(string $status): string {
                         </div>
 
                         <div class="repo-card-actions profile-actions">
-                            <?php if ($canRenew): ?>
-                                <button class="btn btn-sm btn-outline" type="button" disabled title="Akcja do wdrożenia">
-                                    Przedłuż (1x)
-                                </button>
+                            <?php if ($canRenew && $loanId > 0): ?>
+                                <form method="POST" action="/loan/renew">
+                                    <input type="hidden" name="loan_id" value="<?= $loanId ?>">
+                                    <button class="btn btn-sm btn-outline" type="submit">
+                                        Przedłuż (1x)
+                                    </button>
+                                </form>
                             <?php else: ?>
                                 <button class="btn btn-sm btn-disabled" type="button" disabled>
                                     Przedłużono / niedostępne
@@ -136,6 +154,7 @@ function reservationStatusLabel(string $status): string {
         <?php endif; ?>
     </section>
 
+    <!-- REZERWACJE -->
     <section class="profile-panel" data-tab-panel="reservations" hidden>
         <h2 class="profile-section-title">Rezerwacje</h2>
 
@@ -150,7 +169,9 @@ function reservationStatusLabel(string $status): string {
                     <?php
                         $status = (string)($r['status'] ?? '');
                         $isReady = $status === 'READY_FOR_PICKUP';
+                        $reservationId = (int)($r['id'] ?? $r['reservation_id'] ?? 0);
                     ?>
+
                     <article class="repo-card">
                         <div class="repo-card-content">
                             <h3 class="repo-book-title"><?= h($r['title'] ?? '-') ?></h3>
@@ -171,9 +192,18 @@ function reservationStatusLabel(string $status): string {
                         </div>
 
                         <div class="repo-card-actions profile-actions">
-                            <button class="btn btn-sm btn-outline" type="button" disabled title="Akcja do wdrożenia">
-                                Anuluj
-                            </button>
+                            <?php if ($reservationId > 0): ?>
+                                <form method="POST" action="/reservation/cancel" class="js-cancel-reservation">
+                                    <input type="hidden" name="reservation_id" value="<?= $reservationId ?>">
+                                    <button class="btn btn-sm btn-outline" type="submit">
+                                        Anuluj
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <button class="btn btn-sm btn-disabled" type="button" disabled>
+                                    Anuluj
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </article>
                 <?php endforeach; ?>
@@ -181,6 +211,7 @@ function reservationStatusLabel(string $status): string {
         <?php endif; ?>
     </section>
 
+    <!-- HISTORIA -->
     <section class="profile-panel" data-tab-panel="history" hidden>
         <h2 class="profile-section-title">Historia</h2>
 
