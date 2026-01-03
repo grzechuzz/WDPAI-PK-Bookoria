@@ -9,6 +9,10 @@ final class DomainError {
     public const ROLE_NOT_FOUND = 1005;
     public const PASSWORD_MISMATCH = 1006;
     public const BOOK_NOT_FOUND = 1007;
+    public const LOAN_NOT_FOUND = 1008;
+    public const LOAN_RENEW_NOT_ALLOWED = 1009;
+    public const RESERVATION_NOT_FOUND = 1010;
+    public const RESERVATION_CANCEL_NOT_ALLOWED = 1011;
 
     private function __construct() {}
 }
