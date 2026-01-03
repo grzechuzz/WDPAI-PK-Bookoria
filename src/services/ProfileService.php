@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../repositories/LoanRepository.php';
 require_once __DIR__ . '/../repositories/ReservationRepository.php';
+require_once __DIR__ . '/../core/DomainError.php';
 
 
 final class ProfileService
@@ -17,7 +18,7 @@ final class ProfileService
         $this->reservationRepository = $reservationRepository;
     }
 
-    public function getProfileData(int $userId): array
+    public function getProfileData(int $userId)
     {
         $activeLoans = $this->loanRepository->findActiveByUser($userId);
         $activeLoansCount = $this->loanRepository->countActiveByUser($userId);
@@ -34,5 +35,29 @@ final class ProfileService
             'maxLoans' => self::MAX_ACTIVE_LOANS,
             'limitReached' => $activeLoansCount >= self::MAX_ACTIVE_LOANS,
         ];
+    }
+
+    public function renewLoan(int $userId, int $loanId)
+    {
+        $ok = $this->loanRepository->renewIfAllowed($loanId, $userId, 14);
+
+        if (!$ok) {
+            throw new RuntimeException(
+                'Cannot extend loan.',
+                DomainError::LOAN_RENEW_NOT_ALLOWED
+            );
+        }
+    }
+
+    public function cancelReservation(int $userId, int $reservationId)
+    {
+        $ok = $this->reservationRepository->cancelActive($reservationId, $userId);
+
+        if (!$ok) {
+            throw new RuntimeException(
+                'Cannot cancel reservation',
+                DomainError::RESERVATION_CANCEL_NOT_ALLOWED
+            );
+        }
     }
 }
