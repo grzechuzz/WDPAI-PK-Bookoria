@@ -58,5 +58,56 @@ class BookController extends AppController {
             throw $e;
         }
     }
+    
+    public function add()
+    {
+        Auth::requireRole([2]);
 
+        if ($this->isGet()) {
+            return $this->render('books/add-book', [
+                'form' => [
+                    'title' => '',
+                    'authors' => '',
+                    'isbn13' => '',
+                    'publication_year' => '',
+                ],
+                'error' => null,
+            ]);
+        }
+
+        $title = $_POST['title'] ?? '';
+        $authors = $_POST['authors'] ?? '';
+        $isbn13 = $_POST['isbn13'] ?? '';
+        $publicationYear = $_POST['publication_year'] ?? '';
+        $cover = $_FILES['cover'] ?? null;
+
+        try {
+            $roleId = (int)($_SESSION['role_id'] ?? 0);
+
+            $bookId = $this->bookService->createBookWithAuthorsAndCover(
+                $roleId,
+                (string)$title,
+                (string)$isbn13,
+                $publicationYear !== '' ? (string)$publicationYear : null,
+                (string)$authors,
+                is_array($cover) ? $cover : null
+            );
+
+            $_SESSION['flash_success'] = 'Dodano książkę.';
+            unset($_SESSION['flash_error']);
+            $this->redirect('/repository');
+            return;
+
+        } catch (RuntimeException $e) {
+            return $this->render('books/add-book', [
+                'error' => $e->getMessage(),
+                'form' => [
+                    'title' => (string)$title,
+                    'authors' => (string)$authors,
+                    'isbn13' => (string)$isbn13,
+                    'publication_year' => (string)$publicationYear,
+                ],
+            ]);
+        }
+    }
 }
