@@ -27,6 +27,7 @@ $router->get('/book', [new BookController(), 'show']);
 $router->get('/profile', [new ProfileController(), 'index']);
 $router->post('/loan/renew', [new ProfileController(), 'renewLoan']);
 $router->post('/reservation/cancel', [new ProfileController(), 'cancelReservation']);
+$router->post('/reservation/create', [new ProfileController(), 'createReservation']);
 
 $path = $_SERVER['REQUEST_URI']; 
 $router->run($_SERVER['REQUEST_METHOD'], $path);
