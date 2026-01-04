@@ -63,14 +63,8 @@ class BookService {
         ];
     }
 
-    public function createBookWithAuthorsAndCover(
-        int $roleId,
-        string $title,
-        string $isbn13,
-        ?string $publicationYear,
-        string $authorsRaw,
-        ?array $coverFile
-    ) {
+    public function createBookWithAuthorsAndCover(int $roleId, string $title, string $isbn13, ?string $publicationYear, string $authorsRaw, ?string $description, ?array $coverFile) 
+    {
         if ($roleId !== 2) {
             throw new RuntimeException('Brak uprawnień.');
         }
@@ -121,6 +115,15 @@ class BookService {
             throw new RuntimeException('Podaj przynajmniej jednego autora.');
         }
 
+        $description = trim((string)$description);
+        if ($description === '') {
+            $description = null;
+        } else {
+            if (mb_strlen($description) > 5000) {
+                throw new RuntimeException('Opis jest za długi (max 5000 znaków).');
+            }
+        }
+
         if ($this->bookRepository->existsByIsbn13($isbnDigits)) {
             throw new RuntimeException('Znaleziono istniejącą książkę o tym numerze ISBN.');
         }
@@ -134,7 +137,7 @@ class BookService {
         $db->beginTransaction();
 
         try {
-            $bookId = $this->bookRepository->insertBook($title, $isbnDigits, $year, $coverUrl);
+            $bookId = $this->bookRepository->insertBook($title, $isbnDigits, $year, $coverUrl, $description);
 
             foreach ($authors as $name) {
                 $authorId = $this->bookRepository->getOrCreateAuthorId($name);
