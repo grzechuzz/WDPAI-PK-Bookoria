@@ -52,38 +52,144 @@ final class ReservationRepository extends Repository
 
     public function cancelActive(int $reservationId, int $userId)
     {
-        $sql = "
-            UPDATE reservations
-            SET status = 'CANCELLED', ready_until = NULL, assigned_copy_id = NULL
-            WHERE id = :res_id AND user_id = :user_id AND status IN ('QUEUED', 'READY_FOR_PICKUP')
-            RETURNING id
-        ";
+        $this->db->beginTransaction();
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue('res_id', $reservationId, PDO::PARAM_INT);
-        $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
-        $stmt->execute();
+        try {
+            $stmt = $this->db->prepare("
+                SELECT id, assigned_copy_id FROM reservations
+                WHERE id = :res_id AND user_id = :user_id AND status IN ('QUEUED', 'READY_FOR_PICKUP')
+                FOR UPDATE
+            ");
 
-        return $stmt->fetchColumn() !== false;
+            $stmt->execute([
+                'res_id' => $reservationId,
+                'user_id' => $userId,
+            ]);
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$row) {
+                $this->db->rollBack();
+                return false;
+            }
+
+            $copyId = isset($row['assigned_copy_id']) ? (int)$row['assigned_copy_id'] : null;
+
+            $stmt = $this->db->prepare("
+                UPDATE reservations
+                SET status = 'CANCELLED', ready_until = NULL, assigned_copy_id = NULL
+                WHERE id = :res_id
+                RETURNING id
+            ");
+            $stmt->execute(['res_id' => $reservationId]);
+
+            if ($stmt->fetchColumn() === false) {
+                $this->db->rollBack();
+                return false;
+            }
+
+            if ($copyId) {
+                $stmt = $this->db->prepare("
+                    UPDATE copies
+                    SET status = 'AVAILABLE'
+                    WHERE id = :copy_id AND status = 'HELD'
+                ");
+                $stmt->execute(['copy_id' => $copyId]);
+            }
+
+            $this->db->commit();
+            return true;
+
+        } catch (Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
     }
 
-    public function createQueued(int $userId, int $bookId, int $branchId)
+    public function createReadyReservationAndHoldCopy(int $userId, int $bookId, int $branchId)
     {
-        $sql = "
-            INSERT INTO reservations (user_id, book_id, branch_id, status, ready_until, assigned_copy_id, created_at)
-            SELECT :user_id, :book_id, :branch_id, 'QUEUED', NULL, NULL, now()
-            WHERE EXISTS (SELECT 1 FROM books WHERE id = :book_id)
-            AND EXISTS (SELECT 1 FROM branches WHERE id = :branch_id)
-            AND NOT EXISTS (SELECT 1 FROM reservations r WHERE r.user_id = :user_id AND r.book_id = :book_id AND r.status IN ('QUEUED', 'READY_FOR_PICKUP'))
-            RETURNING id
-        ";
+        $this->db->beginTransaction();
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
-        $stmt->bindValue('book_id', $bookId, PDO::PARAM_INT);
-        $stmt->bindValue('branch_id', $branchId, PDO::PARAM_INT);
-        $stmt->execute();
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 1 FROM reservations r
+                WHERE r.user_id = :user_id AND r.book_id = :book_id AND r.branch_id = :branch_id AND r.status IN ('QUEUED', 'READY_FOR_PICKUP')
+                LIMIT 1
+            ");
 
-        return $stmt->fetchColumn() !== false;
+            $stmt->execute([
+                'user_id' => $userId,
+                'book_id' => $bookId,
+                'branch_id' => $branchId,
+            ]);
+
+            if ($stmt->fetchColumn() !== false) {
+                $this->db->rollBack();
+                return false;
+            }
+
+            $stmt = $this->db->prepare("
+                SELECT c.id FROM copies c
+                WHERE c.book_id = :book_id AND c.branch_id = :branch_id AND c.status = 'AVAILABLE'
+                ORDER BY c.id ASC
+                FOR UPDATE SKIP LOCKED
+                LIMIT 1
+            ");
+
+            $stmt->execute([
+                'book_id' => $bookId,
+                'branch_id' => $branchId,
+            ]);
+
+            $copyId = $stmt->fetchColumn();
+            if ($copyId === false) {
+                $this->db->rollBack();
+                return false; 
+            }
+            $copyId = (int)$copyId;
+
+       
+            $stmt = $this->db->prepare("
+                UPDATE copies
+                SET status = 'HELD'
+                WHERE id = :copy_id AND status = 'AVAILABLE'
+                RETURNING id
+            ");
+
+            $stmt->execute(['copy_id' => $copyId]);
+            if ($stmt->fetchColumn() === false) {
+                $this->db->rollBack();
+                return false;
+            }
+
+            $stmt = $this->db->prepare("
+                INSERT INTO reservations (user_id, book_id, branch_id, status, ready_until, assigned_copy_id, created_at)
+                VALUES (:user_id, :book_id, :branch_id, 'READY_FOR_PICKUP', now() + interval '48 hours', :copy_id, now())
+                RETURNING id
+            ");
+
+            $stmt->execute([
+                'user_id' => $userId,
+                'book_id' => $bookId,
+                'branch_id' => $branchId,
+                'copy_id' => $copyId,
+            ]);
+
+            $ok = $stmt->fetchColumn() !== false;
+            if (!$ok) {
+                $this->db->rollBack();
+                return false;
+            }
+
+            $this->db->commit();
+            return true;
+
+        } catch (Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
     }
 }
