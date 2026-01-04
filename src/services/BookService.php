@@ -42,13 +42,19 @@ class BookService {
 
         $book = $rows[0];
         $branches = [];
+
         foreach ($rows as $row) {
-            if ($row['branch_label']) { 
-                $branches[] = [
-                    'label' => $row['branch_label'],
-                    'count' => (int)$row['available_count']
-                ];
+            $label = $row['branch_label'] ?? null;
+            if (!$label) {
+                continue;
             }
+
+            $branchId = (int)($row['branch_id'] ?? 0);
+            $branches[] = [
+                'branch_id' => $branchId,
+                'label' => $label,
+                'count' => (int)($row['available_count'] ?? 0),
+            ];
         }
 
         return [
