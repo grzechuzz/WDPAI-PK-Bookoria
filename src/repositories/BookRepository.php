@@ -92,19 +92,22 @@ class BookRepository extends Repository {
         return $stmt->fetchColumn() !== false;
     }
 
-    public function insertBook(string $title, string $isbn13, ?int $year, ?string $coverUrl): int
+    public function insertBook(string $title, string $isbn13, ?int $year, ?string $coverUrl,?string $description) 
     {
         $stmt = $this->db->prepare("
-            INSERT INTO books (title, isbn13, publication_year, cover_url)
-            VALUES (:title, :isbn13, :year, :cover_url)
+            INSERT INTO books (title, isbn13, publication_year, cover_url, description)
+            VALUES (:title, :isbn13, :year, :cover_url, :description)
             RETURNING id
         ");
+
         $stmt->execute([
             'title' => $title,
             'isbn13' => $isbn13,
             'year' => $year,
             'cover_url' => $coverUrl,
+            'description' => $description,
         ]);
+
         return (int)$stmt->fetchColumn();
     }
 
