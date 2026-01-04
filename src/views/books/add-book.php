@@ -1,5 +1,5 @@
 <?php
-$form = $form ?? ['title'=>'', 'authors'=>'', 'isbn13'=>'', 'publication_year'=>''];
+$form = $form ?? ['title'=>'', 'authors'=>'', 'isbn13'=>'', 'publication_year'=>'', 'description'=>''];
 $error = $error ?? null;
 
 function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
@@ -46,6 +46,16 @@ function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
       <div class="form-group">
         <label for="publication_year">Rok wydania</label>
         <input id="publication_year" name="publication_year" type="text" placeholder="np. 1965" value="<?= h($form['publication_year'] ?? '') ?>">
+      </div>
+
+      <div class="form-group">
+        <label for="description">Opis</label>
+        <textarea
+          id="description"
+          name="description"
+          rows="5"
+          placeholder="Krótki opis książki..."
+        ><?= h($form['description'] ?? '') ?></textarea>
       </div>
 
       <div class="form-group">
