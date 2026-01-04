@@ -25,7 +25,7 @@ class BookRepository extends Repository {
             LEFT JOIN book_authors ba ON b.id = ba.book_id
             LEFT JOIN authors a ON ba.author_id = a.id
             LEFT JOIN v_book_availability_by_branch v ON b.id = v.book_id
-            WHERE 1=1 {$searchSql}  
+            WHERE 1=1 {$searchSql}
             GROUP BY b.id, b.title, b.isbn13, b.cover_url
             ORDER BY b.title ASC, b.id ASC
             LIMIT :limit OFFSET :offset
