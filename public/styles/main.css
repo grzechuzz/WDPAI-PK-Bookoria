@@ -872,6 +872,14 @@ a.dashboard-card:hover .card {
     transition: background 0.2s;
 }
 
+a.btn-primary-lg {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  line-height: normal;
+}
+
+
 .btn-primary-lg:hover {
     background-color: var(--primary-hover);
 }
@@ -919,6 +927,11 @@ a.dashboard-card:hover .card {
   overflow-y: auto;
   padding-right: 6px;
 }
+
+.action-area{
+  margin-top: 1rem;
+}
+
 
 .branch-row{
   background: white;
