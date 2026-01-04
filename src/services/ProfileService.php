@@ -63,7 +63,7 @@ final class ProfileService
 
     public function createReservation(int $userId, int $bookId, int $branchId): void
     {
-        $ok = $this->reservationRepository->createQueued($userId, $bookId, $branchId);
+        $ok = $this->reservationRepository->createReadyReservationAndHoldCopy($userId, $bookId, $branchId);
 
         if (!$ok) {
             throw new RuntimeException(
