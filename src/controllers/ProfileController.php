@@ -24,6 +24,7 @@ final class ProfileController extends AppController
     public function index()
     {
         Auth::requireLogin();
+        Auth::requireRole([3]);
 
         $userId = Auth::userId();
         if ($userId === null) {
@@ -38,6 +39,7 @@ final class ProfileController extends AppController
     public function renewLoan()
     {
         Auth::requireLogin();
+        Auth::requireRole([3]);
 
         if (!$this->isPost()) {
             http_response_code(405);
@@ -77,6 +79,7 @@ final class ProfileController extends AppController
     public function cancelReservation()
     {
         Auth::requireLogin();
+        Auth::requireRole([3]);
 
         if (!$this->isPost()) {
             http_response_code(405);
@@ -116,6 +119,7 @@ final class ProfileController extends AppController
     public function createReservation()
     {
         Auth::requireLogin();
+        Auth::requireRole([3]);
 
         if (!$this->isPost()) {
             http_response_code(405);
