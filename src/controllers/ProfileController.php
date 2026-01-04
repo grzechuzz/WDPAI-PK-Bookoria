@@ -112,4 +112,53 @@ final class ProfileController extends AppController
             throw $e;
         }
     }
+
+    public function createReservation()
+    {
+        Auth::requireLogin();
+
+        if (!$this->isPost()) {
+            http_response_code(405);
+            $this->redirect('/repository');
+            return;
+        }
+
+        $userId = Auth::userId();
+        if (!$userId) {
+            $this->redirect('/login');
+            return;
+        }
+
+        $bookId = filter_input(INPUT_POST, 'book_id', FILTER_VALIDATE_INT);
+        $branchId = filter_input(INPUT_POST, 'branch_id', FILTER_VALIDATE_INT);
+
+        if (!$bookId || $bookId < 1 || !$branchId || $branchId < 1) {
+            http_response_code(400);
+            $_SESSION['flash_error'] = 'Nieprawidłowe żądanie.';
+            unset($_SESSION['flash_success']);
+            $this->redirect('/repository');
+            return;
+        }
+
+        try {
+            $this->profileService->createReservation($userId, (int)$bookId, (int)$branchId);
+
+            $_SESSION['flash_success'] = 'Rezerwacja została utworzona.';
+            unset($_SESSION['flash_error']);
+            $this->redirect('/profile');
+            return;
+
+        } catch (RuntimeException $e) {
+            if ($e->getCode() === DomainError::RESERVATION_CREATE_NOT_ALLOWED) {
+                http_response_code(409);
+                $_SESSION['flash_error'] = 'Nie można utworzyć rezerwacji';
+                unset($_SESSION['flash_success']);
+                $this->redirect('/book?id=' . (int)$bookId);
+                return;
+            }
+
+            http_response_code(500);
+            throw $e;
+        }
+    }
 }
