@@ -59,7 +59,7 @@ final class CopyController extends AppController
                 $copyId = $this->copyService->createCopy($roleId, $bookId, $branchId, $inventoryCode);
 
                 $_SESSION['flash_success'] = 'Dodano egzemplarz (ID: ' . $copyId . ').';
-                $this->redirect('/repository');
+                $this->redirect('/book?id=' . $bookId);
                 return;
 
             } catch (RuntimeException $e) {
