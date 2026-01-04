@@ -151,13 +151,11 @@ final class ProfileController extends AppController
         } catch (RuntimeException $e) {
             if ($e->getCode() === DomainError::RESERVATION_CREATE_NOT_ALLOWED) {
                 http_response_code(409);
-                $_SESSION['flash_error'] = 'Nie można utworzyć rezerwacji';
+                $_SESSION['flash_error'] = 'Nie można utworzyć rezerwacji.';
                 unset($_SESSION['flash_success']);
                 $this->redirect('/book?id=' . (int)$bookId);
                 return;
             }
-
-            http_response_code(500);
             throw $e;
         }
     }
