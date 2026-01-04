@@ -26,7 +26,7 @@ class BookRepository extends Repository {
             LEFT JOIN authors a ON ba.author_id = a.id
             LEFT JOIN v_book_availability_by_branch v ON b.id = v.book_id
             WHERE 1=1 {$searchSql}  
-            GROUP BY b.id, b.title
+            GROUP BY b.id, b.title, b.isbn13, b.cover_url
             ORDER BY b.title ASC, b.id ASC
             LIMIT :limit OFFSET :offset
         ";
@@ -70,13 +70,13 @@ class BookRepository extends Repository {
 
     public function findById(int $id) {
         $sql = "
-            SELECT b.*, STRING_AGG(DISTINCT a.name, ', ') as author, v.branch_label, v.available_count
+            SELECT b.*, STRING_AGG(DISTINCT a.name, ', ') as author, v.branch_id, v.branch_label, v.available_count
             FROM books b
             LEFT JOIN book_authors ba ON b.id = ba.book_id
             LEFT JOIN authors a ON ba.author_id = a.id
             LEFT JOIN v_book_availability_by_branch v ON b.id = v.book_id
             WHERE b.id = :id
-            GROUP BY b.id, v.branch_label, v.available_count
+            GROUP BY b.id, v.branch_id, v.branch_label, v.available_count
         ";
 
         $stmt = $this->db->prepare($sql);
