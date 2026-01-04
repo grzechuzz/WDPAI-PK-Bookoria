@@ -1,5 +1,5 @@
 <div class="dashboard-container">
-    
+
     <div class="dashboard-hero">
         <h1 class="hero-title">
             Witaj w Bookoria!
@@ -18,7 +18,7 @@
     <div class="dashboard-grid">
 
         <?php if ($role_id == 1): ?>
-            
+
             <a href="/users" class="dashboard-card">
                 <article class="card">
                     <div class="card-icon icon-warning">
@@ -50,9 +50,9 @@
                     <div class="card-icon icon-success">
                         <span class="material-symbols-outlined">add_circle</span>
                     </div>
-                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Dodaj Książkę</h2>
+                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Dodaj książkę</h2>
                     <p style="color: var(--text-muted); font-size: 0.9rem;">
-                        Wprowadź nowe pozycje do bazy danych biblioteki.
+                        Wprowadź nową pozycję do katalogu.
                     </p>
                 </article>
             </a>
@@ -60,11 +60,23 @@
             <a href="/repository" class="dashboard-card">
                 <article class="card">
                     <div class="card-icon icon-primary">
-                        <span class="material-symbols-outlined">edit_square</span>
+                        <span class="material-symbols-outlined">library_books</span>
                     </div>
-                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Zarządzaj Książkami</h2>
+                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Księgozbiór</h2>
                     <p style="color: var(--text-muted); font-size: 0.9rem;">
-                        Edytuj, usuwaj i zmieniaj statusy książek w repozytorium.
+                        Przeglądaj katalog i zarządzaj egzemplarzami.
+                    </p>
+                </article>
+            </a>
+
+            <a href="/circulation" class="dashboard-card">
+                <article class="card">
+                    <div class="card-icon icon-warning">
+                        <span class="material-symbols-outlined">assignment</span>
+                    </div>
+                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Wydania i zwroty</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">
+                        Obsłuż rezerwacje, wydawaj książki i przyjmuj zwroty.
                     </p>
                 </article>
             </a>
@@ -96,18 +108,6 @@
             </a>
 
         <?php endif; ?>
-
-        <a href="/logout" class="dashboard-card">
-            <article class="card">
-                <div class="card-icon icon-danger">
-                    <span class="material-symbols-outlined">logout</span>
-                </div>
-                <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Wyloguj się</h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">
-                    Zakończ bezpiecznie sesję i wróć później.
-                </p>
-            </article>
-        </a>
 
     </div>
 </div>
