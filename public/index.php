@@ -8,7 +8,7 @@ require_once __DIR__ . '/../src/controllers/AuthController.php';
 require_once __DIR__ . '/../src/controllers/DashboardController.php';
 require_once __DIR__ . '/../src/controllers/BookController.php';
 require_once __DIR__ . '/../src/controllers/ProfileController.php';
-
+require_once __DIR__ . '/../src/controllers/CopyController.php';
 
 Env::load(__DIR__ . '/../.env');
 
@@ -30,7 +30,8 @@ $router->post('/reservation/cancel', [new ProfileController(), 'cancelReservatio
 $router->post('/reservation/create', [new ProfileController(), 'createReservation']);
 $router->get('/add-book', [new BookController(), 'add']);
 $router->post('/add-book', [new BookController(), 'add']);
-
+$router->get('/copy/add', [new CopyController(), 'add']);
+$router->post('/copy/add', [new CopyController(), 'add']);
 
 $path = $_SERVER['REQUEST_URI']; 
 $router->run($_SERVER['REQUEST_METHOD'], $path);
