@@ -4,6 +4,8 @@ require_once __DIR__ . '/AppController.php';
 require_once __DIR__ . '/../repositories/BookRepository.php';
 require_once __DIR__ . '/../services/BookService.php';
 require_once __DIR__ . '/../core/DomainError.php';
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../core/Auth.php';
 
 
 class BookController extends AppController {
