@@ -25,6 +25,7 @@ foreach ($branches as $br) {
 
 $roleId = (int)($_SESSION['role_id'] ?? 0);
 $canReserve = ($roleId === 3);
+$isLibrarian = ($roleId === 2);
 ?>
 
 <div class="book-details-wrapper">
@@ -106,6 +107,7 @@ $canReserve = ($roleId === 3);
 
                   $isSelected = $canReserve && $isBranchAvailable && $branchId > 0 && $branchId === $defaultBranchId;
 
+    
                   if ($canReserve && $isBranchAvailable && $branchId > 0) {
                       $rowAttrs = 'data-branch-id="' . $branchId . '" role="button" tabindex="0" aria-pressed="' . ($isSelected ? 'true' : 'false') . '"';
                   } else {
@@ -137,6 +139,12 @@ $canReserve = ($roleId === 3);
                 <?php else: ?>
                   <button class="btn-disabled-lg" type="button" disabled>Niedostępna</button>
                 <?php endif; ?>
+
+              <?php elseif ($isLibrarian): ?>
+                <a class="btn-primary-lg" href="/copy/add?book_id=<?= (int)$bookId ?>">
+                  Dodaj egzemplarz
+                </a>
+
               <?php else: ?>
                 <button class="btn-disabled-lg" type="button" disabled>
                   Rezerwacje dostępne tylko dla czytelników
@@ -150,7 +158,13 @@ $canReserve = ($roleId === 3);
 
       <?php else: ?>
         <div class="action-area">
-          <button class="btn-disabled-lg" type="button" disabled>Niedostępna</button>
+          <?php if ($isLibrarian): ?>
+            <a class="btn-primary-lg" href="/copy/add?book_id=<?= (int)$bookId ?>">
+              Dodaj egzemplarz
+            </a>
+          <?php else: ?>
+            <button class="btn-disabled-lg" type="button" disabled>Niedostępna</button>
+          <?php endif; ?>
         </div>
       <?php endif; ?>
 
