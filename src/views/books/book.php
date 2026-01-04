@@ -1,5 +1,8 @@
 <?php
 $branches = $branches ?? [];
+$book = $book ?? [];
+
+function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 
 $isAvailable = false;
 foreach ($branches as $br) {
@@ -9,8 +12,6 @@ foreach ($branches as $br) {
 $statusClass = $isAvailable ? 'status-available' : 'status-unavailable';
 $statusIcon  = $isAvailable ? 'check_circle' : 'cancel';
 $statusText  = $isAvailable ? 'Dostępna w wybranych oddziałach' : 'Brak dostępnych egzemplarzy';
-
-function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 
 $bookId = (int)($book['id'] ?? 0);
 
@@ -24,6 +25,19 @@ foreach ($branches as $br) {
 ?>
 
 <div class="book-details-wrapper">
+
+  <?php if (!empty($_SESSION['flash_success'])): ?>
+    <div class="error-msg" style="color:#155724;background:rgba(40,167,69,0.12);" role="status">
+      <?= h($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?>
+    </div>
+  <?php endif; ?>
+
+  <?php if (!empty($_SESSION['flash_error'])): ?>
+    <div class="error-msg" role="alert">
+      <?= h($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?>
+    </div>
+  <?php endif; ?>
+
   <div class="details-top-bar">
     <a href="/repository" class="back-link">
       <span class="material-symbols-outlined">arrow_back</span>
@@ -82,17 +96,15 @@ foreach ($branches as $br) {
               <?php
                 $count = (int)($branch['count'] ?? 0);
                 $isBranchAvailable = $count > 0;
-
                 $branchId = (int)($branch['branch_id'] ?? 0);
 
-                $branchStatusClass = $isBranchAvailable ? 'status-green' : 'status-red';
                 $isSelected = $isBranchAvailable && $branchId > 0 && $branchId === $defaultBranchId;
 
                 $rowAttrs = $isBranchAvailable && $branchId > 0
                   ? 'data-branch-id="' . $branchId . '" role="button" tabindex="0" aria-pressed="' . ($isSelected ? 'true' : 'false') . '"'
                   : 'aria-disabled="true"';
               ?>
-              <div class="branch-row <?= h($branchStatusClass) ?><?= $isSelected ? ' is-selected' : '' ?>" <?= $rowAttrs ?>>
+              <div class="branch-row<?= $isSelected ? ' is-selected' : '' ?>" <?= $rowAttrs ?>>
                 <div class="branch-name">
                   <span class="material-symbols-outlined">location_on</span>
                   <?= h($branch['label'] ?? '-') ?>
@@ -110,7 +122,12 @@ foreach ($branches as $br) {
 
           <div class="action-area">
             <?php if ($isAvailable && $bookId > 0): ?>
-              <button class="btn-primary-lg" type="submit" id="reserveBtn" <?= $defaultBranchId > 0 ? '' : 'disabled' ?>>
+              <button
+                class="btn-primary-lg"
+                type="submit"
+                id="reserveBtn"
+                <?= $defaultBranchId > 0 ? '' : 'disabled' ?>
+              >
                 Zarezerwuj w oddziale
               </button>
             <?php else: ?>
