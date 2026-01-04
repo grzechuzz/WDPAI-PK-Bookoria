@@ -22,6 +22,9 @@ foreach ($branches as $br) {
         if ($defaultBranchId > 0) break;
     }
 }
+
+$roleId = (int)($_SESSION['role_id'] ?? 0);
+$canReserve = ($roleId === 3);
 ?>
 
 <div class="book-details-wrapper">
@@ -87,54 +90,64 @@ foreach ($branches as $br) {
       </div>
 
       <?php if (!empty($branches)): ?>
-        <form method="POST" action="/reservation/create">
-          <input type="hidden" name="book_id" value="<?= $bookId ?>">
-          <input type="hidden" name="branch_id" id="selectedBranchId" value="<?= (int)$defaultBranchId ?>">
 
-          <div class="branches-list" id="branchesList">
-            <?php foreach ($branches as $branch): ?>
-              <?php
-                $count = (int)($branch['count'] ?? 0);
-                $isBranchAvailable = $count > 0;
-                $branchId = (int)($branch['branch_id'] ?? 0);
+        <?php if ($canReserve): ?>
+          <form method="POST" action="/reservation/create">
+            <input type="hidden" name="book_id" value="<?= $bookId ?>">
+            <input type="hidden" name="branch_id" id="selectedBranchId" value="<?= (int)$defaultBranchId ?>">
+        <?php endif; ?>
 
-                $isSelected = $isBranchAvailable && $branchId > 0 && $branchId === $defaultBranchId;
+            <div class="branches-list" id="branchesList">
+              <?php foreach ($branches as $branch): ?>
+                <?php
+                  $count = (int)($branch['count'] ?? 0);
+                  $isBranchAvailable = $count > 0;
+                  $branchId = (int)($branch['branch_id'] ?? 0);
 
-                $rowAttrs = $isBranchAvailable && $branchId > 0
-                  ? 'data-branch-id="' . $branchId . '" role="button" tabindex="0" aria-pressed="' . ($isSelected ? 'true' : 'false') . '"'
-                  : 'aria-disabled="true"';
-              ?>
-              <div class="branch-row<?= $isSelected ? ' is-selected' : '' ?>" <?= $rowAttrs ?>>
-                <div class="branch-name">
-                  <span class="material-symbols-outlined">location_on</span>
-                  <?= h($branch['label'] ?? '-') ?>
+                  $isSelected = $canReserve && $isBranchAvailable && $branchId > 0 && $branchId === $defaultBranchId;
+
+                  if ($canReserve && $isBranchAvailable && $branchId > 0) {
+                      $rowAttrs = 'data-branch-id="' . $branchId . '" role="button" tabindex="0" aria-pressed="' . ($isSelected ? 'true' : 'false') . '"';
+                  } else {
+                      $rowAttrs = 'aria-disabled="true"';
+                  }
+                ?>
+                <div class="branch-row<?= $isSelected ? ' is-selected' : '' ?>" <?= $rowAttrs ?>>
+                  <div class="branch-name">
+                    <span class="material-symbols-outlined">location_on</span>
+                    <?= h($branch['label'] ?? '-') ?>
+                  </div>
+                  <div class="branch-right">
+                    <?php if ($isBranchAvailable): ?>
+                      <span class="branch-available">Dostępne <?= $count ?></span>
+                    <?php else: ?>
+                      <span class="branch-unavailable">Brak</span>
+                    <?php endif; ?>
+                  </div>
                 </div>
-                <div class="branch-right">
-                  <?php if ($isBranchAvailable): ?>
-                    <span class="branch-available">Dostępne <?= $count ?></span>
-                  <?php else: ?>
-                    <span class="branch-unavailable">Brak</span>
-                  <?php endif; ?>
-                </div>
-              </div>
-            <?php endforeach; ?>
-          </div>
+              <?php endforeach; ?>
+            </div>
 
-          <div class="action-area">
-            <?php if ($isAvailable && $bookId > 0): ?>
-              <button
-                class="btn-primary-lg"
-                type="submit"
-                id="reserveBtn"
-                <?= $defaultBranchId > 0 ? '' : 'disabled' ?>
-              >
-                Zarezerwuj w oddziale
-              </button>
-            <?php else: ?>
-              <button class="btn-disabled-lg" type="button" disabled>Niedostępna</button>
-            <?php endif; ?>
-          </div>
-        </form>
+            <div class="action-area">
+              <?php if ($canReserve): ?>
+                <?php if ($isAvailable && $bookId > 0): ?>
+                  <button class="btn-primary-lg" type="submit" id="reserveBtn" <?= $defaultBranchId > 0 ? '' : 'disabled' ?>>
+                    Zarezerwuj w oddziale
+                  </button>
+                <?php else: ?>
+                  <button class="btn-disabled-lg" type="button" disabled>Niedostępna</button>
+                <?php endif; ?>
+              <?php else: ?>
+                <button class="btn-disabled-lg" type="button" disabled>
+                  Rezerwacje dostępne tylko dla czytelników
+                </button>
+              <?php endif; ?>
+            </div>
+
+        <?php if ($canReserve): ?>
+          </form>
+        <?php endif; ?>
+
       <?php else: ?>
         <div class="action-area">
           <button class="btn-disabled-lg" type="button" disabled>Niedostępna</button>
@@ -145,4 +158,6 @@ foreach ($branches as $br) {
   </div>
 </div>
 
-<script src="/js/book-reserve.js" defer></script>
+<?php if (!empty($branches) && $canReserve): ?>
+  <script src="/js/book-reserve.js" defer></script>
+<?php endif; ?>
