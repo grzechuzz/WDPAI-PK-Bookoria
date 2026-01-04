@@ -80,6 +80,7 @@ class BookController extends AppController {
         $isbn13 = $_POST['isbn13'] ?? '';
         $publicationYear = $_POST['publication_year'] ?? '';
         $cover = $_FILES['cover'] ?? null;
+        $description = $_POST['description'] ?? null;
 
         try {
             $roleId = (int)($_SESSION['role_id'] ?? 0);
@@ -90,6 +91,7 @@ class BookController extends AppController {
                 (string)$isbn13,
                 $publicationYear !== '' ? (string)$publicationYear : null,
                 (string)$authors,
+                $description,
                 is_array($cover) ? $cover : null
             );
 
