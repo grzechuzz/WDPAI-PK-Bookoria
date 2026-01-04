@@ -84,4 +84,53 @@ class BookRepository extends Repository {
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function existsByIsbn13(string $isbn13): bool
+    {
+        $stmt = $this->db->prepare("SELECT 1 FROM books WHERE isbn13 = :isbn LIMIT 1");
+        $stmt->execute(['isbn' => $isbn13]);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function insertBook(string $title, string $isbn13, ?int $year, ?string $coverUrl): int
+    {
+        $stmt = $this->db->prepare("
+            INSERT INTO books (title, isbn13, publication_year, cover_url)
+            VALUES (:title, :isbn13, :year, :cover_url)
+            RETURNING id
+        ");
+        $stmt->execute([
+            'title' => $title,
+            'isbn13' => $isbn13,
+            'year' => $year,
+            'cover_url' => $coverUrl,
+        ]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    public function getOrCreateAuthorId(string $name): int
+    {
+        $name = trim(preg_replace('/\s+/', ' ', $name));
+
+        $stmt = $this->db->prepare("
+            INSERT INTO authors (name)
+            VALUES (:name)
+            ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+            RETURNING id
+        ");
+        $stmt->execute(['name' => $name]);
+
+        return (int)$stmt->fetchColumn();
+    }
+
+
+    public function linkBookAuthor(int $bookId, int $authorId): void
+    {
+        $stmt = $this->db->prepare("
+            INSERT INTO book_authors (book_id, author_id)
+            VALUES (:b, :a)
+            ON CONFLICT DO NOTHING
+        ");
+        $stmt->execute(['b' => $bookId, 'a' => $authorId]);
+    }
 }
