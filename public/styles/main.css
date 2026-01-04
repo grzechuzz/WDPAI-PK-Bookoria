@@ -944,7 +944,21 @@ a.dashboard-card:hover .card {
 }
 
 .branch-available{ color: #16a34a; }   
-.branch-unavailable{ color: #dc2626; } 
+.branch-unavailable{ color: #dc2626; }
+
+.branch-row[data-branch-id] {
+  cursor: pointer;
+}
+
+.branch-row.is-selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(17, 115, 212, 0.12);
+}
+
+.branch-row[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 .profile-page .profile-title {
   margin-bottom: 1rem;
