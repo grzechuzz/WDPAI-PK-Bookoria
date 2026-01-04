@@ -60,4 +60,16 @@ final class ProfileService
             );
         }
     }
+
+    public function createReservation(int $userId, int $bookId, int $branchId): void
+    {
+        $ok = $this->reservationRepository->createQueued($userId, $bookId, $branchId);
+
+        if (!$ok) {
+            throw new RuntimeException(
+                'Cannot create reservation.',
+                DomainError::RESERVATION_CREATE_NOT_ALLOWED
+            );
+        }
+    }
 }
