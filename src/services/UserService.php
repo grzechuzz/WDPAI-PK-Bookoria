@@ -34,6 +34,32 @@ final class UserService
         return $users;
     }
 
+     public function getUsersPaginated(int $page, ?string $emailSearch, ?int $roleFilter)
+    {
+        if ($page < 1) $page = 1;
+        
+        $offset = ($page - 1) * self::USERS_PER_PAGE;
+        $users = $this->userRepo->findPaginatedWithRoles(self::USERS_PER_PAGE, $offset, $emailSearch, $roleFilter);
+        $total = $this->userRepo->countFiltered($emailSearch, $roleFilter);
+        $totalPages = (int)ceil($total / self::USERS_PER_PAGE);
+
+        foreach ($users as &$user) {
+            $user['branches'] = [];
+            if ((int)$user['role_id'] === Config::ROLE_LIBRARIAN) {
+                $user['branches'] = $this->branchStaffRepo->getBranchesForUser((int)$user['id']);
+            }
+        }
+
+        return [
+            'users' => $users,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalUsers' => $total,
+            'emailSearch' => $emailSearch,
+            'roleFilter' => $roleFilter,
+        ];
+    }
+
     public function getAllBranches()
     {
         return $this->branchRepo->findAll();
