@@ -10,7 +10,7 @@ final class CopyRepository extends Repository
     {
         $stmt = $this->db->prepare("
             INSERT INTO copies (book_id, branch_id, inventory_code, status, created_at)
-            VALUES (:book_id, :branch_id, :inventory_code, 'AVAILABLE', now())
+            VALUES (:book_id, :branch_id, :inventory_code, :status, now())
             RETURNING id
         ");
 
@@ -18,7 +18,7 @@ final class CopyRepository extends Repository
             'book_id' => $bookId,
             'branch_id' => $branchId,
             'inventory_code' => $inventoryCode,
-            'available' => Config::COPY_AVAILABLE,
+            'status' => Config::COPY_AVAILABLE,
         ]);
 
         return (int)$stmt->fetchColumn();
