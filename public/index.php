@@ -14,6 +14,11 @@ require_once __DIR__ . '/../src/controllers/CirculationController.php';
 
 Env::load(__DIR__ . '/../.env');
 
+session_set_cookie_params([
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
+
 session_start();
 
 $router = Routing::getInstance();
