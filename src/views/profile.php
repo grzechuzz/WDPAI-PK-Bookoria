@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../core/Config.php';
+
 $activeLoans = $activeLoans ?? [];
 $activeReservations = $activeReservations ?? [];
 $historyLoans = $historyLoans ?? [];
@@ -12,7 +14,6 @@ function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 
 function formatDateTime(?string $ts, string $tz = 'Europe/Warsaw'): string {
     if (!$ts) return '-';
-
     try {
         $dt = new DateTimeImmutable($ts);
         $dt = $dt->setTimezone(new DateTimeZone($tz));
@@ -31,17 +32,6 @@ function loanStatusLabel(array $l): string {
 
     $isOverdue = (bool)($l['is_overdue'] ?? false);
     return $isOverdue ? 'Po terminie' : 'Aktywne';
-}
-
-function reservationStatusLabel(string $status): string {
-    return match ($status) {
-        'QUEUED' => 'W kolejce',
-        'READY_FOR_PICKUP' => 'Gotowa do odbioru',
-        'CANCELLED' => 'Anulowana',
-        'EXPIRED' => 'Wygasła',
-        'FULFILLED' => 'Zrealizowana',
-        default => $status,
-    };
 }
 ?>
 
@@ -62,8 +52,10 @@ function reservationStatusLabel(string $status): string {
     <?php endif; ?>
 
     <?php if ($limitReached): ?>
-        <div class="error-msg" role="alert">
-            Osiągnięto limit wypożyczeń (<?= $activeLoansCount ?> / <?= $maxLoans ?>).
+        <div class="error-msg" role="alert" style="background:rgba(255,193,7,0.15);color:#856404;">
+            <span class="material-symbols-outlined" style="vertical-align:middle;margin-right:0.5rem;">warning</span>
+            Osiągnięto limit wypożyczeń (<?= $activeLoansCount ?> / <?= $maxLoans ?>). 
+            Nie możesz wypożyczyć więcej książek.
         </div>
     <?php endif; ?>
 
@@ -93,7 +85,6 @@ function reservationStatusLabel(string $status): string {
         </button>
     </div>
 
-    <!-- WYPOŻYCZENIA -->
     <section class="profile-panel" data-tab-panel="loans">
         <h2 class="profile-section-title">Wypożyczenia</h2>
 
@@ -109,7 +100,7 @@ function reservationStatusLabel(string $status): string {
                         $status = loanStatusLabel($loan);
                         $isOverdue = (bool)($loan['is_overdue'] ?? false);
                         $renewals = (int)($loan['renewals_count'] ?? 0);
-                        $canRenew = !$isOverdue && $renewals === 0;
+                        $canRenew = !$isOverdue && $renewals < Config::MAX_RENEWALS;
                         $loanId = (int)($loan['loan_id'] ?? $loan['id'] ?? 0);
                     ?>
 
@@ -139,12 +130,12 @@ function reservationStatusLabel(string $status): string {
                                 <form method="POST" action="/loan/renew">
                                     <input type="hidden" name="loan_id" value="<?= $loanId ?>">
                                     <button class="btn btn-sm btn-outline" type="submit">
-                                        Przedłuż (1x)
+                                        Przedłuż
                                     </button>
                                 </form>
                             <?php else: ?>
-                                <button class="btn btn-sm btn-disabled" type="button" disabled>
-                                    Przedłużono / niedostępne
+                                <button class="btn btn-sm btn-disabled" type="button" disabled title="Już przedłużone lub po terminie">
+                                    <?= $renewals >= Config::MAX_RENEWALS ? 'Przedłużono' : 'Niedostępne' ?>
                                 </button>
                             <?php endif; ?>
                         </div>
@@ -153,8 +144,7 @@ function reservationStatusLabel(string $status): string {
             </div>
         <?php endif; ?>
     </section>
-
-    <!-- REZERWACJE -->
+    
     <section class="profile-panel" data-tab-panel="reservations" hidden>
         <h2 class="profile-section-title">Rezerwacje</h2>
 
@@ -168,7 +158,7 @@ function reservationStatusLabel(string $status): string {
                 <?php foreach ($activeReservations as $r): ?>
                     <?php
                         $status = (string)($r['status'] ?? '');
-                        $isReady = $status === 'READY_FOR_PICKUP';
+                        $isReady = $status === Config::RES_READY;
                         $reservationId = (int)($r['id'] ?? $r['reservation_id'] ?? 0);
                     ?>
 
@@ -184,7 +174,7 @@ function reservationStatusLabel(string $status): string {
                                 <span class="material-symbols-outlined status-icon">
                                     <?= $isReady ? 'notifications_active' : 'schedule' ?>
                                 </span>
-                                <?= h(reservationStatusLabel($status)) ?>
+                                <?= h(Config::reservationStatusLabel($status)) ?>
                                 <?php if ($isReady): ?>
                                     • Odbierz do: <?= h(formatDateTime($r['ready_until'] ?? null)) ?>
                                 <?php endif; ?>
@@ -211,7 +201,6 @@ function reservationStatusLabel(string $status): string {
         <?php endif; ?>
     </section>
 
-    <!-- HISTORIA -->
     <section class="profile-panel" data-tab-panel="history" hidden>
         <h2 class="profile-section-title">Historia</h2>
 
@@ -253,7 +242,7 @@ function reservationStatusLabel(string $status): string {
                             </p>
                             <div class="repo-book-status">
                                 <span class="material-symbols-outlined status-icon">history</span>
-                                <?= h(reservationStatusLabel((string)($r['status'] ?? ''))) ?>
+                                <?= h(Config::reservationStatusLabel((string)($r['status'] ?? ''))) ?>
                                 • Utworzono: <?= h(formatDateTime($r['created_at'] ?? null)) ?>
                             </div>
                         </div>
