@@ -7,6 +7,12 @@
             </h1>
         </header>
 
+        <?php if (!empty($_SESSION['flash_success'])): ?>
+            <div class="error-msg" style="color:#155724;background:rgba(40,167,69,0.12);" role="status">
+                <?= htmlspecialchars($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?>
+            </div>
+        <?php endif; ?>
+
         <?php if (!empty($error)): ?>
             <div class="error-msg" role="alert">
                 <?= htmlspecialchars($error) ?>
