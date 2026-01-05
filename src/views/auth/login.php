@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../core/Csrf.php'; ?>
 <section class="login-wrapper">
     <article class="card">
         
@@ -20,6 +21,8 @@
         <?php endif; ?>
 
         <form action="/login" method="POST">
+            <?= Csrf::field() ?>
+            
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" placeholder="email@example.com" required>
