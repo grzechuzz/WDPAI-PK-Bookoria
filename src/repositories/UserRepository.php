@@ -51,4 +51,22 @@ final class UserRepository extends Repository {
 
         return $stmt->fetchColumn() !== false;
     }
+
+    public function findAllWithRoles()
+    {
+        $sql = "SELECT u.id, u.email, u.role_id, r.name as role_name, u.created_at
+                FROM users u
+                JOIN roles r ON r.id = u.role_id
+                ORDER BY u.id ASC";
+        
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    public function updateRole(int $userId, int $roleId)
+    {
+        $stmt = $this->db->prepare("UPDATE users SET role_id = :role_id WHERE id = :id RETURNING id");
+        $stmt->execute(['id' => $userId, 'role_id' => $roleId]);
+        return $stmt->fetchColumn() !== false;
+    }
 }
