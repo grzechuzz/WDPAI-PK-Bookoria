@@ -31,6 +31,7 @@ body {
   line-height: 1.5;
 }
 
+/* FORMULARZE */
 .form-group { margin-bottom: 1rem; }
 
 label {
@@ -54,6 +55,7 @@ select:focus, textarea:focus, input:focus {
   border-color: transparent;
 }
 
+/* PRZYCISKI */
 .btn {
   display: block;
   width: 100%;
@@ -140,6 +142,7 @@ a.btn-primary-lg {
   cursor: not-allowed;
 }
 
+/* LINKI I KOMUNIKATY */
 .text-link {
   color: var(--primary);
   text-decoration: none;
@@ -161,6 +164,7 @@ a.btn-primary-lg {
   border-radius: var(--radius);
 }
 
+/* LAYOUT */
 .app-container {
   width: 100%;
   max-width: 1200px;
@@ -168,6 +172,7 @@ a.btn-primary-lg {
   padding: 1rem;
 }
 
+/* NAVBAR */
 .navbar {
   background-color: var(--bg-white);
   border-bottom: 1px solid var(--border);
@@ -222,6 +227,7 @@ a.btn-primary-lg {
 
 .nav-link:hover { color: var(--primary); }
 
+/* KARTY I LOGOWANIE */
 .login-wrapper {
   display: flex;
   justify-content: center;
@@ -254,6 +260,7 @@ a.btn-primary-lg {
   padding-top: 1rem;
 }
 
+/* DASHBOARD */
 .dashboard-container {
   max-width: 1000px;
   margin: 0 auto;
@@ -313,6 +320,7 @@ a.dashboard-card:hover .card {
 .icon-success { color: var(--success); }
 .icon-warning { color: var(--warning); }
 
+/* REPOZYTORIUM */
 .repo-container {
   max-width: 1000px;
   margin: 0 auto;
@@ -526,6 +534,7 @@ a.dashboard-card:hover .card {
   font-size: 0.95rem;
 }
 
+/* SZCZEGÓŁY KSIĄŻKI */
 .book-details-wrapper {
   max-width: 1100px;
   margin: 0 auto;
@@ -660,6 +669,7 @@ a.dashboard-card:hover .card {
   font-size: 1.1rem;
 }
 
+/* LISTA ODDZIAŁÓW */
 .branches-list {
   display: flex;
   flex-direction: column;
@@ -710,6 +720,7 @@ a.dashboard-card:hover .card {
   cursor: not-allowed;
 }
 
+/* PROFIL UŻYTKOWNIKA */
 .profile-page .profile-title { margin-bottom: 1rem; }
 
 .profile-page .profile-tabs {
@@ -774,6 +785,7 @@ a.dashboard-card:hover .card {
   gap: 0.5rem;
 }
 
+/* CIRCULATION - WYDANIA I ZWROTY */
 .circulation-page .circulation-section { margin-bottom: 2rem; }
 
 .circulation-page .section-title {
@@ -791,6 +803,119 @@ a.dashboard-card:hover .card {
   font-size: 1.75rem;
 }
 
+/* USERS - ZARZĄDZANIE UŻYTKOWNIKAMI */
+.users-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-select {
+  height: 50px;
+  padding: 0 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  background: white;
+  min-width: 150px;
+}
+
+.users-count {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.user-card {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.user-card-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.user-branches {
+  margin-top: 0.5rem;
+}
+
+.user-card-actions {
+  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.user-action-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-danger {
+  background-color: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.btn-danger:hover {
+  background-color: var(--danger);
+  color: white;
+}
+
+/* FLASH SUCCESS */
+.flash-success {
+  color: #155724;
+  background: rgba(40, 167, 69, 0.12);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+}
+
+/* 404 ERROR PAGE */
+.error-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.error-page-content {
+  max-width: 400px;
+}
+
+.error-page-icon {
+  font-size: 5rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.error-page-code {
+  font-size: 6rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.error-page-message {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.error-page-hint {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+/* RESPONSIVE */
 @media (max-width: 768px) {
   .app-container { padding: 0.5rem; }
   .nav-brand { font-size: 1.1rem; }
