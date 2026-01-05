@@ -54,13 +54,67 @@ final class UserRepository extends Repository {
 
     public function findAllWithRoles()
     {
-        $sql = "SELECT u.id, u.email, u.role_id, r.name as role_name, u.created_at
+        $sql = "SELECT u.id, u.email, u.role_id, r.code as role_name, u.created_at
                 FROM users u
                 JOIN roles r ON r.id = u.role_id
                 ORDER BY u.id ASC";
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+     public function findPaginatedWithRoles(int $limit, int $offset, ?string $emailSearch, ?int $roleFilter)
+    {
+        $where = "1=1";
+        $params = ['limit' => $limit, 'offset' => $offset];
+
+        if ($emailSearch) {
+            $where .= " AND LOWER(u.email) LIKE :search";
+            $params['search'] = '%' . mb_strtolower($emailSearch) . '%';
+        }
+
+        if ($roleFilter) {
+            $where .= " AND u.role_id = :role_id";
+            $params['role_id'] = $roleFilter;
+        }
+
+        $sql = "SELECT u.id, u.email, u.role_id, r.name as role_name, u.created_at
+                FROM users u
+                JOIN roles r ON r.id = u.role_id
+                WHERE {$where}
+                ORDER BY u.id ASC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $value) {
+            $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue($key, $value, $type);
+        }
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    public function countFiltered(?string $emailSearch, ?int $roleFilter)
+    {
+        $where = "1=1";
+        $params = [];
+
+        if ($emailSearch) {
+            $where .= " AND LOWER(email) LIKE :search";
+            $params['search'] = '%' . mb_strtolower($emailSearch) . '%';
+        }
+
+        if ($roleFilter) {
+            $where .= " AND role_id = :role_id";
+            $params['role_id'] = $roleFilter;
+        }
+
+        $sql = "SELECT COUNT(*) FROM users WHERE {$where}";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        
+        return (int)$stmt->fetchColumn();
     }
 
     public function updateRole(int $userId, int $roleId)
