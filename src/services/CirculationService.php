@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/../core/Config.php';
 require_once __DIR__ . '/../core/DomainError.php';
-require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../repositories/LoanRepository.php';
 require_once __DIR__ . '/../repositories/ReservationRepository.php';
 require_once __DIR__ . '/../repositories/CopyRepository.php';
@@ -15,17 +14,16 @@ final class CirculationService
     private ReservationRepository $reservationRepo;
     private CopyRepository $copyRepo;
     private BranchStaffRepository $branchStaffRepo;
-    private PDO $db;
 
-    public function __construct(LoanRepository $loanRepo, ReservationRepository $reservationRepo, CopyRepository $copyRepo, BranchStaffRepository $branchStaffRepo) {
+    public function __construct(LoanRepository $loanRepo, ReservationRepository $reservationRepo, CopyRepository $copyRepo, BranchStaffRepository $branchStaffRepo) 
+    {
         $this->loanRepo = $loanRepo;
         $this->reservationRepo = $reservationRepo;
         $this->copyRepo = $copyRepo;
         $this->branchStaffRepo = $branchStaffRepo;
-        $this->db = Database::connect();
     }
 
-    public function getCirculationData(int $librarianId): array
+    public function getCirculationData(int $librarianId)
     {
         $branchIds = $this->branchStaffRepo->getBranchIdsForUser($librarianId);
         
@@ -50,7 +48,7 @@ final class CirculationService
         ];
     }
 
-    public function assertLibrarianHasBranchAccess(int $librarianId, int $branchId): void
+    public function assertLibrarianHasBranchAccess(int $librarianId, int $branchId)
     {
         if (!$this->branchStaffRepo->isUserAssignedToBranch($librarianId, $branchId)) {
             throw new RuntimeException('Nie masz uprawnień do tego oddziału.', DomainError::BRANCH_ACCESS_DENIED);
@@ -84,7 +82,7 @@ final class CirculationService
             throw new RuntimeException('Użytkownik osiągnął limit wypożyczeń.', DomainError::LOAN_LIMIT_REACHED);
         }
 
-        $this->db->beginTransaction();
+        $this->loanRepo->getDb()->beginTransaction();
 
         try {
             $ok = $this->reservationRepo->fulfillReservation($reservationId);
@@ -97,23 +95,28 @@ final class CirculationService
                 throw new RuntimeException('Egzemplarz nie jest dostępny do wydania.', DomainError::COPY_NOT_AVAILABLE);
             }
 
+
             $loanId = $this->loanRepo->createLoan($userId, $copyId, Config::LOAN_DAYS);
             if (!$loanId) {
-                throw new RuntimeException('Nie udało się utworzyć wypożyczenia.', DomainError::LOAN_CREATE_FAILED);
+                throw new RuntimeException(
+                    'Nie udało się utworzyć wypożyczenia.',
+                    DomainError::LOAN_CREATE_FAILED
+                );
             }
 
-            $this->db->commit();
+            $this->loanRepo->getDb()->commit();
             return $loanId;
 
         } catch (Throwable $e) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
+            $db = $this->loanRepo->getDb();
+            if ($db->inTransaction()) {
+                $db->rollBack();
             }
             throw $e;
         }
     }
 
-    public function returnBook(int $librarianId, int $loanId): void
+    public function returnBook(int $librarianId, int $loanId)
     {
         $loan = $this->loanRepo->findById($loanId);
 
@@ -130,7 +133,7 @@ final class CirculationService
 
         $copyId = (int)$loan['copy_id'];
 
-        $this->db->beginTransaction();
+        $this->loanRepo->getDb()->beginTransaction();
 
         try {
             $ok = $this->loanRepo->returnLoan($loanId);
@@ -143,11 +146,12 @@ final class CirculationService
                 $this->copyRepo->updateStatus($copyId, Config::COPY_AVAILABLE);
             }
 
-            $this->db->commit();
+            $this->loanRepo->getDb()->commit();
 
         } catch (Throwable $e) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
+            $db = $this->loanRepo->getDb();
+            if ($db->inTransaction()) {
+                $db->rollBack();
             }
             throw $e;
         }
@@ -167,7 +171,6 @@ final class CirculationService
         return $loan;
     }
 
-    
     public function getReservationDetails(int $librarianId, int $reservationId)
     {
         $reservation = $this->reservationRepo->findById($reservationId);
