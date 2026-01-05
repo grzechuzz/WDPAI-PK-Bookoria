@@ -34,14 +34,14 @@ final class UserService
         return $users;
     }
 
-     public function getUsersPaginated(int $page, ?string $emailSearch, ?int $roleFilter)
+    public function getUsersPaginated(int $page, ?string $emailSearch, ?int $roleFilter)
     {
         if ($page < 1) $page = 1;
         
-        $offset = ($page - 1) * self::USERS_PER_PAGE;
-        $users = $this->userRepo->findPaginatedWithRoles(self::USERS_PER_PAGE, $offset, $emailSearch, $roleFilter);
+        $offset = ($page - 1) * Config::USERS_PER_PAGE;
+        $users = $this->userRepo->findPaginatedWithRoles(Config::USERS_PER_PAGE, $offset, $emailSearch, $roleFilter);
         $total = $this->userRepo->countFiltered($emailSearch, $roleFilter);
-        $totalPages = (int)ceil($total / self::USERS_PER_PAGE);
+        $totalPages = (int)ceil($total / Config::USERS_PER_PAGE);
 
         foreach ($users as &$user) {
             $user['branches'] = [];
