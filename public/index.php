@@ -11,6 +11,7 @@ require_once __DIR__ . '/../src/controllers/BookController.php';
 require_once __DIR__ . '/../src/controllers/ProfileController.php';
 require_once __DIR__ . '/../src/controllers/CopyController.php';
 require_once __DIR__ . '/../src/controllers/CirculationController.php';
+require_once __DIR__ . '/../src/controllers/UserController.php';
 
 Env::load(__DIR__ . '/../.env');
 
@@ -42,6 +43,10 @@ $router->post('/copy/add', [new CopyController(), 'add']);
 $router->get('/circulation', [new CirculationController(), 'index']);
 $router->post('/circulation/issue', [new CirculationController(), 'issue']);
 $router->post('/circulation/return', [new CirculationController(), 'returnBook']);
+$router->get('/users', [new UserController(), 'index']);
+$router->post('/users/role', [new UserController(), 'changeRole']);
+$router->post('/users/assign-branch', [new UserController(), 'assignBranch']);
+$router->post('/users/remove-branch', [new UserController(), 'removeBranch']);
 
 $path = $_SERVER['REQUEST_URI']; 
 $router->run($_SERVER['REQUEST_METHOD'], $path);
