@@ -62,7 +62,7 @@ function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
         <label for="cover">Okładka</label>
         <input id="cover" name="cover" type="file" accept="image/png,image/jpeg,image/webp">
         <small style="color: var(--text-muted); display:block; margin-top:0.35rem;">
-          JPG/PNG/WEBP, max 5MB.
+          JPG/PNG, max 5MB.
         </small>
       </div>
 
