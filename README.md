@@ -25,7 +25,6 @@ http://localhost:8080
 ```
 ## Domyślne dane logowania
 
-### Aplikacja
 | Rola | Email | Hasło |
 |------|-------|-------|
 | Administrator | uzytkownik3@gmail.com | superhaslo |
