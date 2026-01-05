@@ -37,6 +37,7 @@ final class Config
     public const MAX_INVENTORY_CODE_LENGTH = 64;
 
     public const BOOKS_PER_PAGE = 3;
+    public const USERS_PER_PAGE = 10;
     public const HISTORY_LIMIT = 50;
     public const HISTORY_MAX_LIMIT = 200;
 
