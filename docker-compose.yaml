@@ -21,6 +21,8 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
     networks:
       - pg-network
   
@@ -30,15 +32,19 @@ services:
       dockerfile: docker/php/Dockerfile
     volumes:
       - .:/app
+    env_file:
+      - .env
     networks:
       - pg-network
   
   pgadmin-wdpai:
     image: dpage/pgadmin4:latest
-    container_name: pg-admin2
+    container_name: pg-admin
+    env_file:
+      - .env
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
       - "5050:80"
     networks:
