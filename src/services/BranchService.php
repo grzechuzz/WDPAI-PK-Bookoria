@@ -1,6 +1,8 @@
 <?php
 
+require_once __DIR__ . '/../core/DomainError.php';
 require_once __DIR__ . '/../repositories/BranchRepository.php';
+
 
 final class BranchService
 {
@@ -11,15 +13,21 @@ final class BranchService
         $this->branchRepository = $branchRepository;
     }
 
-    public function listAllBranches(): array
+    public function listAllBranches()
     {
         return $this->branchRepository->findAll();
     }
 
+  
     public function assertBranchExists(int $branchId)
     {
         if ($branchId < 1 || !$this->branchRepository->existsById($branchId)) {
-            throw new RuntimeException('Wybrany oddział nie istnieje.');
+            throw new RuntimeException('Wybrany oddział nie istnieje.', DomainError::BRANCH_NOT_FOUND);
         }
+    }
+
+    public function getBranchById(int $branchId)
+    {
+        return $this->branchRepository->findById($branchId);
     }
 }
