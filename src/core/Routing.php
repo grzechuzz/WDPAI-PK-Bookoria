@@ -45,7 +45,7 @@ class Routing
         $handler();
     }
 
-    private function render404(): 
+    private function render404()
     {
         $templatePath = __DIR__ . '/../views/errors/404.php';
         
