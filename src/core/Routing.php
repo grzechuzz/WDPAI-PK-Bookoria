@@ -38,10 +38,25 @@ class Routing
         $handler = $this->routes[$method][$path] ?? null;
         if ($handler === null) {
             http_response_code(404);
-            echo '404 Not Found';
+            $this->render404();
             return;
         }
 
         $handler();
+    }
+
+    private function render404(): 
+    {
+        $templatePath = __DIR__ . '/../views/errors/404.php';
+        
+        if (file_exists($templatePath)) {
+            ob_start();
+            include $templatePath;
+            $content = ob_get_clean();
+
+            include __DIR__ . '/../views/layout.php';
+        } else {
+            echo '404 Not Found';
+        }
     }
 }
