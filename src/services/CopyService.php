@@ -37,12 +37,10 @@ final class CopyService
             throw new RuntimeException('Nie znaleziono oddziału.');
         }
 
-        // pre-check (ładny komunikat)
         if ($this->copyRepository->existsByInventoryCode($inventoryCode)) {
             throw new RuntimeException('Taki kod inwentarzowy już istnieje.');
         }
 
-        // finalna ochrona: jeśli masz UNIQUE w DB, to i tak przechwycisz wyjątek
         return $this->copyRepository->insertCopy($bookId, $branchId, $inventoryCode);
     }
 }
