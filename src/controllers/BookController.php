@@ -1,24 +1,28 @@
 <?php 
 
 require_once __DIR__ . '/AppController.php';
-require_once __DIR__ . '/../repositories/BookRepository.php';
-require_once __DIR__ . '/../services/BookService.php';
+require_once __DIR__ . '/../core/Config.php';
 require_once __DIR__ . '/../core/DomainError.php';
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Auth.php';
+require_once __DIR__ . '/../repositories/BookRepository.php';
+require_once __DIR__ . '/../services/BookService.php';
 
 
-class BookController extends AppController {
-
+class BookController extends AppController
+{
     private BookService $bookService;
 
-    public function __construct() {
+    public function __construct()
+    {
         $db = Database::connect();
         $repo = new BookRepository($db);
         $this->bookService = new BookService($repo);
     }
 
-    public function index() {
+ 
+    public function index()
+    {
         Auth::requireLogin();
 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -28,13 +32,13 @@ class BookController extends AppController {
         $this->render('books/repository', $data);
     }
 
-
-    public function show() {
+    public function show()
+    {
         Auth::requireLogin();
 
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
         if (!$id || $id < 1) {
-            http_response_code(400);
+            $_SESSION['flash_error'] = 'Nieprawidłowy identyfikator książki.';
             $this->redirect('/repository');
             return;
         }
@@ -42,37 +46,37 @@ class BookController extends AppController {
         try {
             $data = $this->bookService->getDetails($id);
 
-            return $this->render('books/book', [
+            $this->render('books/book', [
                 'book' => $data['details'],
                 'branches' => $data['branches'],
             ]);
 
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             if ($e->getCode() === DomainError::BOOK_NOT_FOUND) {
-                http_response_code(404);
+                $_SESSION['flash_error'] = 'Książka nie została znaleziona.';
                 $this->redirect('/repository');
                 return;
             }
-
-            http_response_code(500);
             throw $e;
         }
     }
     
     public function add()
     {
-        Auth::requireRole([2]);
+        Auth::requireAdmin();
 
         if ($this->isGet()) {
-            return $this->render('books/add-book', [
+            $this->render('books/add-book', [
                 'form' => [
                     'title' => '',
                     'authors' => '',
                     'isbn13' => '',
                     'publication_year' => '',
+                    'description' => '',
                 ],
                 'error' => null,
             ]);
+            return;
         }
 
         $title = $_POST['title'] ?? '';
@@ -83,7 +87,7 @@ class BookController extends AppController {
         $description = $_POST['description'] ?? null;
 
         try {
-            $roleId = (int)($_SESSION['role_id'] ?? 0);
+            $roleId = Auth::roleId();
 
             $bookId = $this->bookService->createBookWithAuthorsAndCover(
                 $roleId,
@@ -95,19 +99,19 @@ class BookController extends AppController {
                 is_array($cover) ? $cover : null
             );
 
-            $_SESSION['flash_success'] = 'Dodano książkę.';
+            $_SESSION['flash_success'] = 'Książka została dodana do katalogu.';
             unset($_SESSION['flash_error']);
-            $this->redirect('/repository');
-            return;
+            $this->redirect('/book?id=' . $bookId);
 
         } catch (RuntimeException $e) {
-            return $this->render('books/add-book', [
+            $this->render('books/add-book', [
                 'error' => $e->getMessage(),
                 'form' => [
                     'title' => (string)$title,
                     'authors' => (string)$authors,
                     'isbn13' => (string)$isbn13,
                     'publication_year' => (string)$publicationYear,
+                    'description' => (string)($description ?? ''),
                 ],
             ]);
         }

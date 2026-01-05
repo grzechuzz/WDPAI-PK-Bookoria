@@ -1,20 +1,26 @@
 <?php
 
 require_once __DIR__ . '/AppController.php';
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../repositories/RoleRepository.php';
 require_once __DIR__ . '/../services/AuthService.php';
 
 
-class AuthController extends AppController {
+class AuthController extends AppController
+{
     private AuthService $authService;
 
-    public function __construct() {
+    public function __construct()
+    {
         $db = Database::connect();
         $userRepo = new UserRepository($db);
         $roleRepo = new RoleRepository($db);
         $this->authService = new AuthService($userRepo, $roleRepo);
     }
 
-    public function login() {
+    public function login() 
+    {
         if ($this->isPost()) {
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
@@ -29,14 +35,16 @@ class AuthController extends AppController {
                 return;
                 
             } catch (RuntimeException $e) {
-                return $this->render('auth/login', ['error' => $e->getMessage()]);
+                $this->render('auth/login', ['error' => $e->getMessage()]);
+                return;
             }
         }
 
-        return $this->render('auth/login');
+        $this->render('auth/login');
     }
 
-    public function register() {
+    public function register(): void
+    {
         if ($this->isPost()) {
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
@@ -44,18 +52,22 @@ class AuthController extends AppController {
 
             try {
                 $this->authService->register($email, $password, $confirmedPassword);
+                
+                $_SESSION['flash_success'] = 'Konto zostało utworzone. Możesz się zalogować.';
                 $this->redirect('/login');
                 return;
 
             } catch (RuntimeException $e) {
-                return $this->render('auth/register', ['error' => $e->getMessage()]);
+                $this->render('auth/register', ['error' => $e->getMessage()]);
+                return;
             }
         }
 
-        return $this->render('auth/register');
+        $this->render('auth/register');
     }
 
-    public function logout() {
+    public function logout(): void
+    {
         $_SESSION = [];
         session_destroy();
         $this->redirect('/login');

@@ -1,10 +1,13 @@
 <?php
 
 require_once __DIR__ . '/AppController.php';
+require_once __DIR__ . '/../core/Config.php';
+require_once __DIR__ . '/../core/DomainError.php';
 require_once __DIR__ . '/../core/Auth.php';
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../repositories/CopyRepository.php';
 require_once __DIR__ . '/../repositories/BranchRepository.php';
+require_once __DIR__ . '/../repositories/BranchStaffRepository.php';
 require_once __DIR__ . '/../services/CopyService.php';
 require_once __DIR__ . '/../services/BranchService.php';
 
@@ -17,24 +20,22 @@ final class CopyController extends AppController
     public function __construct()
     {
         $db = Database::connect();
-        $repo = new CopyRepository($db);
+        $copyRepo = new CopyRepository($db);
         $branchRepo = new BranchRepository($db);
-        $this->copyService = new CopyService($repo);
+        $branchStaffRepo = new BranchStaffRepository($db);
+        
+        $this->copyService = new CopyService($copyRepo, $branchStaffRepo);
         $this->branchService = new BranchService($branchRepo);
     }
 
     public function add()
     {
-        Auth::requireLogin();
+        Auth::requireLibrarian();
 
-        $roleId = (int)($_SESSION['role_id'] ?? 0);
-        if ($roleId !== 2) {
-            http_response_code(403);
-            echo '403 Forbidden';
-            return;
-        }
+        $userId = Auth::userId();
+        $roleId = Auth::roleId();
 
-        $branches = $this->branchService->listAllBranches();
+        $branches = $this->copyService->getBranchesForLibrarian($userId);
 
         $form = [
             'book_id' => (string)($_GET['book_id'] ?? ''),
@@ -55,16 +56,20 @@ final class CopyController extends AppController
             ];
 
             try {
-                $this->branchService->assertBranchExists($branchId);
-                $copyId = $this->copyService->createCopy($roleId, $bookId, $branchId, $inventoryCode);
+                $copyId = $this->copyService->createCopy($userId, $roleId, $bookId, $branchId, $inventoryCode);
 
-                $_SESSION['flash_success'] = 'Dodano egzemplarz (ID: ' . $copyId . ').';
+                $_SESSION['flash_success'] = 'Egzemplarz został dodany (ID: ' . $copyId . ').';
+                unset($_SESSION['flash_error']);
                 $this->redirect('/book?id=' . $bookId);
                 return;
 
             } catch (RuntimeException $e) {
                 $error = $e->getMessage();
             }
+        }
+
+        if (empty($branches)) {
+            $error = $error ?? 'Nie jesteś przypisany do żadnego oddziału. Skontaktuj się z administratorem.';
         }
 
         $this->render('copies/add', [

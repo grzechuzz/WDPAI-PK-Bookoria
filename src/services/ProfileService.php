@@ -3,12 +3,11 @@
 require_once __DIR__ . '/../repositories/LoanRepository.php';
 require_once __DIR__ . '/../repositories/ReservationRepository.php';
 require_once __DIR__ . '/../core/DomainError.php';
+require_once __DIR__ . '/../core/Config.php';
 
 
 final class ProfileService
 {
-    private const MAX_ACTIVE_LOANS = 5;
-
     private LoanRepository $loanRepository;
     private ReservationRepository $reservationRepository;
 
@@ -23,8 +22,8 @@ final class ProfileService
         $activeLoans = $this->loanRepository->findActiveByUser($userId);
         $activeLoansCount = $this->loanRepository->countActiveByUser($userId);
         $activeReservations = $this->reservationRepository->findActiveByUser($userId);
-        $historyLoans = $this->loanRepository->findHistoryByUser($userId, 50);
-        $historyReservations = $this->reservationRepository->findHistoryByUser($userId, 50);
+        $historyLoans = $this->loanRepository->findHistoryByUser($userId, Config::HISTORY_LIMIT);
+        $historyReservations = $this->reservationRepository->findHistoryByUser($userId, Config::HISTORY_LIMIT);
 
         return [
             'activeLoans' => $activeLoans,
@@ -32,20 +31,17 @@ final class ProfileService
             'activeReservations' => $activeReservations,
             'historyReservations' => $historyReservations,
             'activeLoansCount' => $activeLoansCount,
-            'maxLoans' => self::MAX_ACTIVE_LOANS,
-            'limitReached' => $activeLoansCount >= self::MAX_ACTIVE_LOANS,
+            'maxLoans' => Config::MAX_ACTIVE_LOANS,
+            'limitReached' => $activeLoansCount >= Config::MAX_ACTIVE_LOANS,
         ];
     }
 
     public function renewLoan(int $userId, int $loanId)
     {
-        $ok = $this->loanRepository->renewIfAllowed($loanId, $userId, 14);
+        $ok = $this->loanRepository->renewIfAllowed($loanId, $userId, Config::LOAN_RENEWAL_DAYS);
 
         if (!$ok) {
-            throw new RuntimeException(
-                'Cannot extend loan.',
-                DomainError::LOAN_RENEW_NOT_ALLOWED
-            );
+            throw new RuntimeException( 'Nie można przedłużyć wypożyczenia.', DomainError::LOAN_RENEW_NOT_ALLOWED);
         }
     }
 
@@ -54,22 +50,16 @@ final class ProfileService
         $ok = $this->reservationRepository->cancelActive($reservationId, $userId);
 
         if (!$ok) {
-            throw new RuntimeException(
-                'Cannot cancel reservation',
-                DomainError::RESERVATION_CANCEL_NOT_ALLOWED
-            );
+            throw new RuntimeException('Nie można anulować tej rezerwacji.', DomainError::RESERVATION_CANCEL_NOT_ALLOWED);
         }
     }
 
-    public function createReservation(int $userId, int $bookId, int $branchId): void
+    public function createReservation(int $userId, int $bookId, int $branchId)
     {
         $ok = $this->reservationRepository->createReadyReservationAndHoldCopy($userId, $bookId, $branchId);
 
         if (!$ok) {
-            throw new RuntimeException(
-                'Cannot create reservation.',
-                DomainError::RESERVATION_CREATE_NOT_ALLOWED
-            );
+            throw new RuntimeException('Nie można utworzyć rezerwacji.', DomainError::RESERVATION_CREATE_NOT_ALLOWED);
         }
     }
 }
