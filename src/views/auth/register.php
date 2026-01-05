@@ -3,7 +3,7 @@
         
         <header>
             <h1 class="card-title">
-                Rejestracja
+                Zarejestruj się
             </h1>
         </header>
 
@@ -21,12 +21,12 @@
 
             <div class="form-group">
                 <label for="password">Hasło</label>
-                <input type="password" id="password" name="password" placeholder="Minimum 8 znaków" required>
+                <input type="password" id="password" name="password" placeholder="Min. 8 znaków" required>
             </div>
 
             <div class="form-group">
                 <label for="confirmedPassword">Powtórz hasło</label>
-                <input type="password" id="confirmedPassword" name="confirmedPassword" placeholder="Wpisz hasło ponownie" required>
+                <input type="password" id="confirmedPassword" name="confirmedPassword" placeholder="Powtórz hasło" required>
             </div>
 
             <button type="submit" class="btn">Zarejestruj się</button>
