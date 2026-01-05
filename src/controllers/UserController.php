@@ -29,18 +29,23 @@ final class UserController extends AppController
     {
         Auth::requireAdmin();
 
-        $users = $this->userService->getUsersWithDetails();
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $emailSearch = isset($_GET['email']) ? trim($_GET['email']) : null;
+        $roleFilter = isset($_GET['role']) && $_GET['role'] !== '' ? (int)$_GET['role'] : null;
+
+        if ($emailSearch === '') $emailSearch = null;
+
+        $data = $this->userService->getUsersPaginated($page, $emailSearch, $roleFilter);
         $branches = $this->userService->getAllBranches();
 
-        $this->render('users/index', [
-            'users' => $users,
+        $this->render('users/index', array_merge($data, [
             'branches' => $branches,
             'roles' => [
                 Config::ROLE_ADMIN => 'Administrator',
                 Config::ROLE_LIBRARIAN => 'Bibliotekarz',
                 Config::ROLE_READER => 'Czytelnik',
             ],
-        ]);
+        ]));
     }
 
     public function changeRole()
