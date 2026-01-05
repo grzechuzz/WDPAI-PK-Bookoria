@@ -78,7 +78,7 @@ final class UserRepository extends Repository {
             $params['role_id'] = $roleFilter;
         }
 
-        $sql = "SELECT u.id, u.email, u.role_id, r.name as role_name, u.created_at
+        $sql = "SELECT u.id, u.email, u.role_id, r.code as role_name, u.created_at
                 FROM users u
                 JOIN roles r ON r.id = u.role_id
                 WHERE {$where}
