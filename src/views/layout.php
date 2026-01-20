@@ -12,6 +12,7 @@
 
     <link rel="stylesheet" href="/styles/main.css">
     <script src="/js/profile-tabs.js" defer></script>
+    <script src="/js/nav-menu.js" defer></script>
 </head>
 <body>
 <header class="navbar">
@@ -21,7 +22,13 @@
             <span>Bookoria</span>
         </a>
 
-        <nav class="nav-actions">
+        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+
+        <nav class="nav-actions" id="navActions">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <?php $roleId = (int)($_SESSION['role_id'] ?? 0); ?>
 
@@ -30,7 +37,6 @@
                 <?php endif; ?>
 
                 <a href="/repository" class="nav-link">Repozytorium</a>
-                <a href="/help" class="nav-link">Pomoc</a>
                 <a href="/logout" class="nav-link">Wyloguj się</a>
 
             <?php else: ?>
